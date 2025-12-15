@@ -1,0 +1,32 @@
+# 📁 Google Drive UI Clone (React + Tailwind)
+
+A **Google Drive–style file manager UI** built using **React** and **Tailwind CSS**, focused on **frontend architecture, interaction patterns, and real-world UI behavior**.
+
+This project replicates how Google Drive *feels* to use — not just how it looks.
+
+> ⚠️ Frontend-only project  
+> Uses **dummy data**. No backend, authentication, or real file storage.
+
+
+## ✨ Features
+
+- 📂 Folder & file grid layout (Drive-like)
+- 🖱️ **Right-click context menu** (custom, browser menu disabled)
+- 🧠 Context menu adapts based on item type (**file vs folder**)
+- ❌ Click outside to close menus (proper boundary handling)
+- 📱 Fully responsive (desktop & mobile)
+- 🎨 Clean UI with Tailwind CSS
+- 🧱 Scalable, component-driven architecture
+
+---
+
+## Screenshots
+
+### Desktop
+![Desktop](/src/assets/desktop.png)
+
+### Context Menu
+![Context Menu](/src/assets/menusOpen.png)
+
+### Mobile
+![Mobile](/src/assets/mobile.png)
