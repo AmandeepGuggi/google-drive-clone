@@ -7,7 +7,7 @@ import {
   MdDeleteOutline,
 } from "react-icons/md";
 
-export default function ContextMenu({ menuRef, position, onClose , type}) {
+export default function ContextMenu({ menuRef, position, onClose , type, handleRenameSubmit}) {
   useEffect(() => {
     function handleOutside(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -25,24 +25,28 @@ export default function ContextMenu({ menuRef, position, onClose , type}) {
     label: "Open",
     icon: MdOpenInNew,
     allowedFor: ["file"], // 👈 NOT folder
+    onClicking: {handleRenameSubmit}
   },
   {
     id: "rename",
     label: "Rename",
     icon: MdDriveFileRenameOutline,
     allowedFor: ["file", "folder"],
+    onClicking: handleRenameSubmit
   },
   {
     id: "download",
     label: "Download",
     icon: MdDownload,
     allowedFor: ["file"],
+    onClicking: {handleRenameSubmit}
   },
   {
     id: "star",
     label: "Add to starred",
     icon: MdStarBorder,
     allowedFor: ["file", "folder"],
+    onClicking: {handleRenameSubmit}
   },
   {
     id: "delete",
@@ -50,6 +54,7 @@ export default function ContextMenu({ menuRef, position, onClose , type}) {
     icon: MdDeleteOutline,
     danger: true,
     allowedFor: ["file", "folder"],
+    onClicking: {handleRenameSubmit}
   },
 ];
 const visibleOptions = fileOptions.filter((opt) =>
@@ -77,6 +82,7 @@ const visibleOptions = fileOptions.filter((opt) =>
               ${opt.danger ? "text-red-600" : "text-gray-700"}
             `}
             onClick={() => {
+              opt.onClicking()
               console.log(opt.id);
               onClose();
             }}

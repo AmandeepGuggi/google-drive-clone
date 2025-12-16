@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { getUniqueFolderName } from "../utility";
+import { getUniquename } from "../utility";
 
-export default function CreateFolderModal({ onClose, existingNames, onCreate }) {
-  const [folderName, setFolderName] = useState("Untitled folder");
+export default function NameModal({ onClose, existingNames, onSubmit, initialName, title }) {
+  const [name, setName] = useState(initialName);
   const inputRef = useRef(null);
   const modalRef = useRef(null);
     useEffect(() => {
@@ -12,7 +12,7 @@ export default function CreateFolderModal({ onClose, existingNames, onCreate }) 
   inputRef.current.focus();
   inputRef.current.select();
 }, []);
-const isDisabled = !folderName.trim();
+const isDisabled = !name.trim();
 
 // console.log(existingNames);
   useEffect(() => {
@@ -36,13 +36,14 @@ const isDisabled = !folderName.trim();
   }, [onClose]);
 
   function handleSubmit() {
-  const base = folderName.trim() || "Untitled folder";
-  const uniqueName = getUniqueFolderName(base, existingNames);
+  const base = name.trim()
+  const finalName = existingNames.length
+    ? getUniquename(base, existingNames)
+    : base;
 
-  onCreate(uniqueName);
+  onSubmit(finalName);
   onClose();
 }
-
 
   return createPortal(
     <div className="fixed inset-0 z-99 flex items-center justify-center bg-black/30">
@@ -50,7 +51,7 @@ const isDisabled = !folderName.trim();
         ref={modalRef}
         className="w-96 rounded-xl bg-white p-6 shadow-xl"
       >
-        <h2 className="text-lg font-medium mb-4">New folder</h2>
+        <h2 className="text-lg font-medium mb-4">{title}</h2>
 
         <input
         //   autoFocus
@@ -61,8 +62,8 @@ const isDisabled = !folderName.trim();
     }
   }}
           ref={inputRef}
-          value={folderName}
-          onChange={(e) => setFolderName(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           placeholder="Untitled folder"
           className="w-full rounded-md border px-3 py-2 outline-blue-500"
         />
@@ -78,9 +79,10 @@ const isDisabled = !folderName.trim();
 
           <button
             onClick={handleSubmit}
+            disabled={isDisabled}
             // className="rounded-full bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
              className={`rounded-full px-4 py-2 text-sm text-white
-    ${isDisabled ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"}`}
+    ${isDisabled ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
           >
             Create
           </button>

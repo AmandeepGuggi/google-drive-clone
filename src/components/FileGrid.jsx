@@ -3,8 +3,8 @@ import { useRef, useState } from "react";
 import ContextMenu from "./ContextMenu";
 import { FaFolder } from "react-icons/fa";
 
-export default function FileGrid() {
-  const [menuState, setMenuState] = useState(null);
+export default function FileGrid({handleRenameSubmit, menuState, setMenuState}) {
+  
   const menuRef = useRef(null);
 
   return (
@@ -96,6 +96,7 @@ export default function FileGrid() {
 
       {menuState && (
         <ContextMenu
+        handleRenameSubmit={handleRenameSubmit}
           menuRef={menuRef}
           position={{ x: menuState.x, y: menuState.y }}
           type={menuState.type}

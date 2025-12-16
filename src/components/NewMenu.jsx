@@ -1,5 +1,4 @@
 import { MdFileUpload, MdDriveFolderUpload } from "react-icons/md";
-import CreateFolderModal from "./CreateFolderModal";
 import { useState } from "react";
 
 export default function NewMenu({reff, onCreateFolder}) {
