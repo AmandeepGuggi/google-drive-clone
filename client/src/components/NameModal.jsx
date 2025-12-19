@@ -7,6 +7,8 @@ export default function NameModal({
   initialName,
   title,
   setNewName,
+  actionLabel,
+  renameType
 }) {
   const inputRef = useRef(null);
   const modalRef = useRef(null);
@@ -16,6 +18,23 @@ export default function NameModal({
     inputRef.current.focus();
     inputRef.current.select();
   }, []);
+
+  useEffect(() => {
+  if (!inputRef.current) return;
+
+  // Run only on first open, not typing
+  requestAnimationFrame(() => {
+    const dotIndex = initialName.lastIndexOf(".");
+    inputRef.current.focus();
+
+    if (dotIndex > 0) {
+      inputRef.current.setSelectionRange(0, dotIndex);
+    } else {
+      inputRef.current.setSelectionRange(0, initialName.length);
+    }
+  });
+
+}, [renameType]); 
   const isDisabled = !initialName.trim();
 
   // console.log(existingNames);
@@ -73,7 +92,7 @@ export default function NameModal({
         : "bg-blue-600 hover:bg-blue-700"
     }`}
             >
-              Create
+             {actionLabel}
             </button>
           </div>
         </form>

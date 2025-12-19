@@ -137,6 +137,8 @@ export default function App() {
    * Click row to open directory or file
    */
   function handleRowClick(type, id) {
+    console.log("navi");
+    console.log(type, id);
     if (type === "directory") {
       navigate(`/directory/${id}`);
     } else {
@@ -404,18 +406,58 @@ export default function App() {
     setRenameValue(currentName);
     setShowRenameModal(true);
   }
-  async function handleRenameSubmit(name) {
+  function closeRename() {
+    setRenameType(null);
+    setRenameId("");
+    setRenameValue("");
+    setShowRenameModal(false);
+  }
+
+  // async function handleRenameSubmit(name) {
+  //   try {
+  //     if (renameType === "folder") {
+  //       await renameDirectory(renameId, name);
+  //     } else {
+  //       console.log("hi");
+  //       await renameFile(renameId, name);
+  //     }
+  //     setShowRenameModal(false);
+  //     // refetchData();
+  //   } catch (err) {
+  //     setErrorMessage(err.message);
+  //   }
+  // }
+
+
+  async function handleRenameSubmit(e) {
+    e.preventDefault();
+    setErrorMessage("");
     try {
-      if (renameType === "folder") {
-        await renameDirectory(renameId, name);
-      } else {
-        console.log("hi");
-        await renameFile(renameId, name);
-      }
+      const url =
+        renameType === "file"
+          ? `${BASE_URL}/file/${renameId}`
+          : `${BASE_URL}/directory/${renameId}`;
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          renameType === "file"
+            ? { newFilename: renameValue }
+            : { newDirName: renameValue }
+        ),
+        credentials: "include",
+      });
+      await handleFetchErrors(response);
+
       setShowRenameModal(false);
-      // refetchData();
-    } catch (err) {
-      setErrorMessage(err.message);
+      setRenameValue("");
+      setRenameType(null);
+      setRenameId(null);
+      getDirectoryItems();
+    } catch (error) {
+      setErrorMessage(error.message);
     }
   }
 
@@ -444,7 +486,7 @@ export default function App() {
       {/* <Header /> */}
       <div className="flex-1 flex flex-col">
         <Topbar
-          onProfileClick={() => setShowProfile(!showProfile)}
+          onProfileToggle={() => setShowProfile(prev => !prev)}
           showProfile={showProfile}
           onProfileClose={() => setShowProfile(false)}
         />
@@ -456,6 +498,13 @@ export default function App() {
 
         <main className="p-4 h-full bg-white mb-2 mr-4 ml-4 rounded-2xl overflow-y-auto">
           <FileGrid
+          handleContextMenu={handleContextMenu}
+          handleDeleteDirectory={handleDeleteDirectory}
+          openRenameModal={openRenameModal}
+          BASE_URL={BASE_URL}
+          setActiveContextMenu={setActiveContextMenu}
+
+          handleRowClick={handleRowClick}
           folders={directoriesList}
           files={filesList}
             onRename={openRename}
@@ -463,7 +512,8 @@ export default function App() {
             setMenuState={setContextMenu}
             handleRenameSubmit={() => {
               setContextMenu(null);
-              setShowRenameModal(true);
+              setShowRenameModal(false);
+              setActiveContextMenu(null)
             }}
           />
         </main>
@@ -480,13 +530,13 @@ export default function App() {
       )}
       {showRenameModal && (
         <NameModal
-          initialName="profile"
-          existingNames={files.map((f) => f.name)}
-          onSubmit={(name) => {
-            console.log("renamed Item:", name);
-          }}
-          onClose={() => setShowRenameModal(false)}
-          title="Rename Modal"
+          initialName={renameValue}
+          setNewName={setRenameValue}
+          onSubmit={handleRenameSubmit}
+          renameType={renameType}
+
+          onClose={closeRename}
+          title={renameType === "file" ? "Rename file" : "Rename folder"}
           actionLabel="Rename"
         />
       )}

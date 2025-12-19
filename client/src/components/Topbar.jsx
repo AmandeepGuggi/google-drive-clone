@@ -35,7 +35,7 @@ export default function Topbar({
 
      <div className="rounded-full overflow-hidden w-10 h-10">
        <img
-        onClick={onProfileClick}
+        onClick={onProfileToggle}
         src="/photo2.jpeg"
         className=" object-cover w-full h-full cursor-pointer"
       />

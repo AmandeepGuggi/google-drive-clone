@@ -13,7 +13,7 @@ export default function ProfileMenu({reff}) {
       <div className="flex flex-col md:flex-row justify-between gap-1 mt-4">
         <button className="text-gray-600  bg-white px-8 text-[14px] rounded-full md:rounded-r-none md:rounded-l-full text-nowrap py-2">
          + Add account</button>
-        <button className=" text-gray-600 bg-white px-8 text-[14px] rounded-full md:rounded-l-none md:rounded-r-full py-2 text-nowrap">
+        <button className=" text-gray-600 cursor-pointer bg-white px-8 text-[14px] rounded-full md:rounded-l-none md:rounded-r-full py-2 text-nowrap">
           <FaSignOutAlt className="inline mr-2" />Sign out</button>
       </div>
     </div>
