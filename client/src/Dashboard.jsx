@@ -93,46 +93,16 @@ export default function App() {
   useEffect(() => {
     getDirectoryItems();
     // Reset context menu
-    // setActiveContextMenu(null);
     setActiveContextMenu(null);
+    setActiveContextMenu(null);
+    setContextMenu(null);
   }, [dirId]);
-
+  
+  console.log(directoriesList);
   /**
    * Decide file icon
    */
-  function getFileIcon(filename) {
-    const ext = filename.split(".").pop().toLowerCase();
-    switch (ext) {
-      case "pdf":
-        return "pdf";
-      case "png":
-      case "jpg":
-      case "jpeg":
-      case "gif":
-        return "image";
-      case "mp4":
-      case "mov":
-      case "avi":
-        return "video";
-      case "zip":
-      case "rar":
-      case "tar":
-      case "gz":
-        return "archive";
-      case "js":
-      case "jsx":
-      case "ts":
-      case "tsx":
-      case "html":
-      case "css":
-      case "py":
-      case "java":
-        return "code";
-      default:
-        return "alt";
-    }
-  }
-
+ 
   /**
    * Click row to open directory or file
    */
@@ -498,6 +468,7 @@ export default function App() {
 
         <main className="p-4 h-full bg-white mb-2 mr-4 ml-4 rounded-2xl overflow-y-auto">
           <FileGrid
+          directoryName={directoryName}
           handleContextMenu={handleContextMenu}
           handleDeleteDirectory={handleDeleteDirectory}
           openRenameModal={openRenameModal}

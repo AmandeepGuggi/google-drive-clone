@@ -15,14 +15,15 @@ router.get("/", readFiles);
 
 // UPDATE
 router.patch("/:id", updateFile);
+router.patch("/", updateFile);
 
 // DELETE
 router.delete("/:id", deleteFile);
 
 //GET ALL
-router.get("/", (req,res) => {
-    res.send("all files")
-})
+// router.get("/", (req,res) => {
+//     res.send("all files")
+// })
 
 
 export default router;

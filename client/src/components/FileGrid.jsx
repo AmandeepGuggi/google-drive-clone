@@ -174,10 +174,13 @@
 
 import { useRef } from "react";
 import ContextMenu from "./ContextMenu";
-import { FaFolder } from "react-icons/fa";
+import { FaFolder, FaFolderOpen } from "react-icons/fa";
 import { formatBytes, getFileIcon } from "../utility";
 
 export default function FileGrid({
+
+  directoryName,
+
   handleContextMenu,
   BASE_URL,
   handleRowClick,
@@ -207,6 +210,12 @@ export default function FileGrid({
 
   return (
     <>
+   <h1 className="mb-6 px-4 py-1 text-lg font-medium 
+               rounded-full border border-gray-300 bg-gray-100
+               text-gray-700 inline-block">
+  {directoryName}
+</h1>
+
       <h2 className="mb-3 font-semibold">Folders</h2>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

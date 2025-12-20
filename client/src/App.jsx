@@ -9,7 +9,7 @@ const router = createBrowserRouter([
     element: <Dashboard />
   },
   {
-    path: "/directory/:id?",
+    path: "/directory/:dirId?",
     element: <Dashboard />
   },
   {

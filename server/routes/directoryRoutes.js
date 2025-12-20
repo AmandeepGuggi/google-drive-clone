@@ -5,13 +5,14 @@ import { createDirectory, deleteDirectory, getDirectorybyId, renameDirectory } f
 
 const router = express.Router();
 
-router.get("/:id" , getDirectorybyId);
 router.get("/" , getDirectorybyId);
+router.get("/:id" , getDirectorybyId);
 
 router.post("/:parentDirId", createDirectory);
 router.post("/", createDirectory);
 
 router.patch('/:id', renameDirectory);
+router.patch('/', renameDirectory);
 
 router.delete("/:id", deleteDirectory);
 

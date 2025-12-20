@@ -52,11 +52,14 @@ export const createFile = async (req, res, next) => {
 
 export const readFiles = async(req, res) => {
   const { id } = req.params;
-  const fileData = await Files.findOne({_id: new ObjectId(String(id)) , userId: req.user._id})
+  const fileData = await Files.findOne({_id: id , userId: req.user._id})
   // Check if file exists
   if (!fileData) {
-    return res.status(404).json({ error: "Your not found!" });
+    return res.status(404).json({ error: "No such file exists!" });
   }
+
+   const filePath = `${process.cwd()}/storage/${id}.${fileData.extension}`;
+
 
   // If "download" is requested, set the appropriate headers
   if (req.query.action === "download") {
@@ -64,36 +67,56 @@ export const readFiles = async(req, res) => {
   }
 
   // Send file
-  return res.sendFile(`${process.cwd()}/storage/${id}${fileData.extension}`, (err) => {
+  return res.sendFile(filePath, (err) => {
     if (!res.headersSent && err) {
       return res.status(404).json({ error: "File not f!" });
     }
   });
 }
 
-export const updateFile =  async (req, res, next) => {
+// export const updateFile =  async (req, res, next) => {
+//   const { id } = req.params;
+//   const fileData = await Files.findOne({_id: id, userId: req.user._id})
+
+//   // Check if file exists
+//   if (!fileData) {
+//     return res.status(404).json({ error: "File not found!" });
+//   }
+
+//   // Perform rename
+//   try {
+//     await Files.updateOne({_id: id, userId: req.user._id}, {$set: {name: req.body.newFilename}})
+//     return res.status(200).json({ message: "Renamed" });
+//   } catch (err) {
+//     err.status = 500;
+//     next(err);
+//   }
+// }
+export const updateFile = async (req, res, next) => {
   const { id } = req.params;
-  const fileData = await Files.findOne({_id: new ObjectId(String(id)) , userId: req.user._id})
 
-  // Check if file exists
-  if (!fileData) {
-    return res.status(404).json({ error: "File not found!" });
-  }
-
-  // Perform rename
   try {
-    // await writeFile("./filesDB.json", JSON.stringify(filesData));
-    await Directory.updateOne({_id: fileData._id , userId: req.user._id}, {$set: {name: req.body.newFilename}})
+    const result = await Files.updateOne(
+      { _id: id, userId: req.user._id },
+      { $set: { name: req.body.newFilename } }
+    );
+    console.log(result);
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: "File not found or unauthorized!" });
+    }
+
     return res.status(200).json({ message: "Renamed" });
   } catch (err) {
     err.status = 500;
     next(err);
   }
-}
+};
+
 
 export const deleteFile =  async (req, res, next) => {
   const { id } = req.params;
-  const fileData = await Files.findOne({_id: new ObjectId(String(id)) , userId: req.user._id});
+  const fileData = await Files.findOne({_id: id, userId: req.user._id});
 
   // Check if file exists
   if (!fileData) {
