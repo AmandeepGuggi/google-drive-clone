@@ -2,11 +2,6 @@
 
 A **Google Drive–style file manager UI** built using **React** and **Tailwind CSS**, focused on **frontend architecture, interaction patterns, and real-world UI behavior**.
 
-This project replicates how Google Drive *feels* to use — not just how it looks.
-
-> ⚠️ Frontend-only project  
-> Uses **dummy data**. No backend, authentication, or real file storage.
-
 
 ## ✨ Features
 
