@@ -1,6 +1,20 @@
 import mongoose from "mongoose"
 import Directory from "../modals/directoryModal.js"
 import User from "../modals/userModal.js"
+import crypto from "node:crypto";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({
+  path: path.resolve(__dirname, "../.env"),
+  debug: false,
+});
+
+const secretKey = process.env.SecretKey
 
 
 export const registerUser = async (req, res, next) => {
@@ -69,10 +83,23 @@ export const loginUser = async (req, res, next) => {
   if (!user) {
     return res.status(404).json({ error: 'Invalid Credentials' })
   }
-  const maxAge = 1000 * 60 * 60 * 4   // 4 hours
-  res.cookie('uid', user._id.toString(), {
+
+  const cookiePayload = JSON.stringify({
+    id: user._id.toString(),
+    expiry: Math.round(Date.now() / 1000 + 100000)
+  })
+
+  const signature = crypto.createHash("sha256")
+  .update(secretKey)
+  .update(cookiePayload)
+  .update(secretKey)
+  .digest("base64url")
+
+  const signedCookiePayload = `${Buffer.from(cookiePayload).toString("base64url")}.${signature}`;
+  
+  res.cookie('token', signedCookiePayload, {
     httpOnly: true,
-    maxAge,
+    maxAge: 1000 * 60 * 60 * 4 ,
     sameSite: "strict",
   })
   res.status(201).json({ message: 'logged in' })

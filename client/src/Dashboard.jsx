@@ -98,7 +98,6 @@ export default function App() {
     setContextMenu(null);
   }, [dirId]);
   
-  console.log(directoriesList);
   /**
    * Decide file icon
    */
@@ -107,8 +106,6 @@ export default function App() {
    * Click row to open directory or file
    */
   function handleRowClick(type, id) {
-    console.log("navi");
-    console.log(type, id);
     if (type === "directory") {
       navigate(`/directory/${id}`);
     } else {
@@ -436,7 +433,6 @@ export default function App() {
       <Sidebar
         directoryName={directoryName}
         onUploadFilesClick={() => {
-          console.log("fc");
           fileInputRef.current.click();
         }}
         fileInputRef={fileInputRef}
