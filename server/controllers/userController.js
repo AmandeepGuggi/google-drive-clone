@@ -1,10 +1,10 @@
 import mongoose from "mongoose"
 import Directory from "../modals/directoryModal.js"
 import User from "../modals/userModal.js"
-import crypto from "node:crypto";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import bcrypt from 'bcrypt'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,14 +31,13 @@ export const registerUser = async (req, res, next) => {
   try {
     const userRootDirId = new mongoose.Types.ObjectId();
      const userId = new mongoose.Types.ObjectId();
-     const salt = crypto.randomBytes(16)
-     const hashedPassword = crypto.pbkdf2Sync(password, salt, 100000, 32, "sha256")
+   const hashedPassword = await bcrypt.hash(password, 12)
      
     await User.create([{
       _id: userId,
       fullname,
       email,
-      password: `${salt.toString("base64url")}.${hashedPassword.toString("base64url")}`,
+      password: hashedPassword,
       rootDirId: userRootDirId
     }], { session })
    await Directory.create([{
@@ -75,24 +74,16 @@ export const loginUser = async (req, res, next) => {
       message: "No user exists with this email account or wrong email/password entered."
     })
   }
-  const [storedSalt, storedHash] = foundUser.password.split(".");
-  console.log(foundUser.password);
-  const hashedPassword = crypto.pbkdf2Sync(
-  password,                       
-  Buffer.from(storedSalt, "base64url"),
-  100000,                          
-  32,                              
-  "sha256"                        
-)
-console.log(hashedPassword);
+ 
 
-  const user = await User.findOne({ email, password: `${storedSalt.toString("base64url")}.${hashedPassword.toString("base64url")}` })
-  if (!user) {
+  const isPasswordValid = bcrypt.compare(password, foundUser.password)
+
+  if (!isPasswordValid) {
     return res.status(404).json({ error: 'Invalid Credentials' })
   }
 
   const cookiePayload = JSON.stringify({
-    id: user._id.toString(),
+    id: foundUser._id.toString(),
     expiry: Math.round(Date.now() / 1000 + 100000)
   })
 
