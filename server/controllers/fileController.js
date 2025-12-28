@@ -5,42 +5,96 @@ import Directory from "../modals/directoryModal.js";
 import Files from "../modals/fileModal.js";
 
 
-export const createFile = async(req, res, next) => {
-  const user = req.user
-  let _id = req.params.parentDirId ? req.params.parentDirId : req.user.rootDirId;
-  const parentDirData = await Directory.findOne({ _id });
-  if(!parentDirData){
-    return res.status(404).json({error: "Parent directory does not exists"})
-  }
+// export const createFile = async(req, res, next) => {
+//   const user = req.user
+ 
+//   let _id = req.params.parentDirId ? req.params.parentDirId : req.user.rootDirId;
+//   const parentDirData = await Directory.findOne({ _id });
+//   if(!parentDirData){
+//     return res.status(404).json({error: "Parent directory does not exists"})
+//   }
   
- const filename = req.headers.filename || "untitled";
- const extension = path.extname(filename);
+//  const filename = req.headers.filename || "untitled";
+//  const extension = path.extname(filename);
 
-    try {
-      const insertedFile = await Files.insertOne({
+//     try {
+//       const insertedFile = await Files.insertOne({
+//       extension,
+//       name: filename,
+//       parentDirId:  parentDirData._id,
+//       userId: user._id
+//     })
+//     const fullFileName = `${insertedFile._id.toString()}${extension}`;
+//     const writeStream = createWriteStream(`./storage/${fullFileName}`);
+//     req.pipe(writeStream);
+
+//       req.on("end", async () => {
+//         return res.status(201).json({ message: "File Uploaded" });
+//       })
+
+//       req.on("error", async () => {
+//         Files.deleteOne({_id: insertedFile._id })
+//         return res.status(404).json({ message: "could not upload file" });
+//       })
+
+//     } catch (err) {
+//       next(err);
+//     }
+
+//   }
+
+export const createFile = async (req, res, next) => {
+  const user = req.user;
+
+  const _id = req.params.parentDirId ?? req.user.rootDirId;
+  const parentDirData = await Directory.findOne({ _id });
+  if (!parentDirData) {
+    return res.status(404).json({ error: "Parent directory does not exist" });
+  }
+
+  const filename = req.headers.filename || "untitled";
+  const extension = path.extname(filename);
+
+  let bytesWritten = 0;
+
+  try {
+    const insertedFile = await Files.insertOne({
       extension,
       name: filename,
-      parentDirId:  parentDirData._id,
-      userId: user._id
-    })
-    const fullFileName = `${insertedFile._id.toString()}${extension}`;
+      parentDirId: parentDirData._id,
+      userId: user._id,
+      size: 0, // temporary
+    });
+
+    const fullFileName = `${insertedFile._id}${extension}`;
     const writeStream = createWriteStream(`./storage/${fullFileName}`);
+
+    // 🔑 COUNT BYTES AS THEY FLOW
+    req.on("data", chunk => {
+      bytesWritten += chunk.length;
+    });
+
     req.pipe(writeStream);
 
-      req.on("end", async () => {
-        return res.status(201).json({ message: "File Uploaded" });
-      })
+    writeStream.on("finish", async () => {
+      await Files.updateOne(
+        { _id: insertedFile._id },
+        { $set: { size: bytesWritten } }
+      );
 
-      req.on("error", async () => {
-        Files.deleteOne({_id: insertedFile._id })
-        return res.status(404).json({ message: "could not upload file" });
-      })
+      res.status(201).json({ message: "File uploaded", size: bytesWritten });
+    });
 
-    } catch (err) {
-      next(err);
-    }
+    writeStream.on("error", async () => {
+      await Files.deleteOne({ _id: insertedFile._id });
+      res.status(500).json({ error: "File write failed" });
+    });
 
+  } catch (err) {
+    next(err);
   }
+};
+
 
 export const readFiles = async(req, res) => {
   const { id } = req.params;

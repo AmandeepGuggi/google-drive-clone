@@ -1,4 +1,4 @@
-import { FaPlus, FaSearch } from "react-icons/fa";
+import { FaPlus, FaSearch, FaToolbox } from "react-icons/fa";
 import ProfileMenu from "./ProfileMenu";
 import NewMenu from "./NewMenu";
 import { useRef, useEffect, useState } from "react";
@@ -84,30 +84,33 @@ export default function Topbar({
   };
 
   return (
-    <header className="flex items-center justify-between px-4 py-2 bg-primary relative">
-      <div className="flex items-center md:block w-full mr-4 px-4 py-2 rounded-full bg-secondary outline-none">
-        <FaSearch className="inline mr-2" />
+    <header className="flex items-center border-b border-gray-300 justify-between  px-4 bg-primary relative">
+      <div className="flex items-center md:block w-full mr-4 py-1.75 px-4 outline-none">
+        <FaSearch className="inline mr-2 text-gray-400" />
          <input
-        className="w-[90%] border-0 outline-0"
-        placeholder="Search in Drive"
+        className="w-[90%] py-2.25 text-[15px] border-0 outline-0"
+        placeholder="Start typing to search your file"
       />
-      </div>
+     
 
-     {/* <div className="rounded-full overflow-hidden w-10 h-10">
-       <img
-        onClick={onProfileToggle}
-        src="/photo2.jpeg"
-        className=" object-cover w-full h-full cursor-pointer"
-      />
-     </div> */}
+      </div>
+<div className="h-full border border-gray-300">
+
+</div>
     <div 
-  className="rounded-full overflow-hidden min-w-10 h-10 flex items-center justify-center  bg-orange-400 cursor-pointer"
+  className=" pl-3 "
   onClick={onProfileToggle}
 >
   {userName ? (
-    <span className="text-sm font-semibold text-white">
+   <div className="flex items-center gap-3">
+     <span className="text-sm font-semibold text-white rounded-full overflow-hidden min-w-9 h-9 flex items-center justify-center  bg-orange-400 cursor-pointer">
       {userName.charAt(0).toUpperCase()}
     </span>
+    <div>
+      <p className="text-sm font-bold tracking-widest">{userName}</p>
+      <p className="text-sm ">{userEmail}</p>
+    </div>
+    </div>
   ) : (
     <img
       src="/photo2.jpeg"

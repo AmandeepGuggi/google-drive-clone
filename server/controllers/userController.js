@@ -75,6 +75,7 @@ export const loginUser = async (req, res, next) => {
     })
   }
  
+try{
 
   const isPasswordValid = bcrypt.compare(password, foundUser.password)
 
@@ -94,6 +95,10 @@ export const loginUser = async (req, res, next) => {
     sameSite: "strict",
   })
   res.status(201).json({ message: 'logged in' })
+}catch(err){
+  console.log("login err is", err);
+  res.end()
+}
 }
 
 export const logout = (req, res) => {

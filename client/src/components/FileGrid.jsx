@@ -4,9 +4,8 @@ import { FaFolder } from "react-icons/fa";
 import { formatBytes, getFileIcon } from "../utility";
 
 export default function FileGrid({
-
   directoryName,
-
+progressMap,
   handleContextMenu,
   BASE_URL,
   handleRowClick,
@@ -19,9 +18,9 @@ export default function FileGrid({
   uploadProgress,
   handleCancelUpload,
   handleDeleteFile,
+  files,
 
   folders,
-  files,
   onRename,
   handleRenameSubmit,
   menuState,
@@ -36,15 +35,27 @@ export default function FileGrid({
 
   return (
     <>
-   <h1 className="mb-6 px-4 py-1 text-lg font-medium 
-               rounded-full border border-gray-300 bg-gray-100
-               text-gray-700 inline-block">
-  {directoryName}
-</h1>
+      <h1
+        className="mb-6 px- py-1 text-lg font-medium 
+               text-gray-700 inline-block"
+      >
+        {directoryName}{" "}
+        <span className="text-sm text-gray-400 font-extralight">
+          (1,023 files)
+        </span>
+      </h1>
 
-      <h2 className="mb-3 font-semibold">Folders</h2>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="text-sm flex border-b pb-3 pl-2 border-gray-300 justify-between">
+        <p className="flex gap-4">
+          {" "}
+          <input type="checkbox" className="visiblity-none " />{" "}
+          <span>File name</span>
+        </p>
+        <p>Last modified</p>
+        <p>File size</p>
+        <p> </p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1">
         {folders.map((f) => (
           <div
             onClick={() =>
@@ -63,10 +74,11 @@ export default function FileGrid({
                 type: "folder",
               });
             }}
-            className="relative px-4 py-3 flex justify-between bg-secondary rounded-lg shadow-sm cursor-pointer"
+            className="relative px-2 py-3 flex border-gray-300  justify-between border-b cursor-pointer"
           >
-            <div>
-              <FaFolder className="inline mr-2 text-2xl" /> {f.name}
+            <div className="flex items-center gap-2">
+              <input type="checkbox" name="" id="" />
+              <FaFolder className="inline text-2xl text-blue-400" /> {f.name}
             </div>
 
             <button
@@ -87,11 +99,11 @@ export default function FileGrid({
         ))}
       </div>
 
-      <h2 className="mb-3 font-semibold">Files</h2>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2  md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-1  ">
         {files.map((file) => {
-            const isUploadingItem = file.id.startsWith("temp-");
+           const uploadProgress = progressMap[file.id] || 0;
+          const isUploadingItem = file.id.startsWith("temp-");
+          console.log(isUploadingItem);
           return (
             <div
               key={file.id}
@@ -110,61 +122,65 @@ export default function FileGrid({
                   type: "file",
                 });
               }}
-              className="relative bg-white rounded-lg p-3 shadow-sm cursor-pointer"
+              className="relative bg-white border-b border-gray-300 py-3 px-2 cursor-pointer"
             >
-              <div className="flex gap-2">
-                <img
-                  className="w-16 h-16 bg-pink-200 rounded-full p-2 inline"
-                  src={getFileIcon(file.name)}
-                  alt="file icon"
-                />
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1">
+                  <input type="checkbox" name="" id="" />
+                  <img
+                    className="inline w-8"
+                    src={getFileIcon(file.name)}
+                    alt="file icon"
+                  />
+                  <p className="text-sm w-40 truncate">{file.name}</p>
+                </div>
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    setMenuState({
-                      id: file.id,
-                      x: rect.right + 4,
-                      y: rect.top,
-                      type: "file",
-                    });
-                  }}
-                  className="absolute top-2 right-2 w-5 h-9"
-                >
-                  ⋮
-                </button>
+                <p> </p>
+                <p className="text-gray-300 text-sm">
+                  {formatBytes(file.size)}
+                </p>
+                <p> </p>
               </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setMenuState({
+                    id: file.id,
+                    x: rect.right + 4,
+                    y: rect.top,
+                    type: "file",
+                  });
+                }}
+                className="absolute top-2 right-2 w-5 h-9"
+              >
+                ⋮
+              </button>
 
-              <p className="text-sm truncate">{file.name}</p>
-              <p className="text-gray-300 text-sm">{formatBytes(file.size)}</p>
-                {isUploadingItem && (
-         <div className="bg-neutral-500 rounded-md mt-1 mb-2 overflow-hidden relative mx-2">
-  <span className="absolute text-[12px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white">
-    {Math.floor(uploadProgress)}%
-  </span>
+              {isUploadingItem && (
+                <div className="bg-neutral-500 rounded-md mt-1 mb-2 overflow-hidden relative mx-2">
+                  <span className="absolute text-[12px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white">
+                    {Math.floor(uploadProgress)}%
+                  </span>
 
-  <div
-    className={`
+                  <div
+                    className={`
       h-4 rounded-md
       ${uploadProgress === 100 ? "bg-green-600" : "bg-blue-600"}
     `}
-    style={{ width: `${uploadProgress}%` }}
-  ></div>
-</div>
-
-        )}
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
-      
-
       {/* SINGLE CONTEXT MENU BELOW */}
       {menuState && selectedItem && (
         <ContextMenu
-        handleRowClick={handleRowClick}
+          handleRowClick={handleRowClick}
           item={selectedItem}
           type={menuState.type}
           position={{ x: menuState.x, y: menuState.y }}

@@ -1,7 +1,13 @@
 import express from "express";
-import { createFile, deleteFile, readFiles, updateFile } from "../controllers/FileController.js";
+import { createFile, deleteFile, readFiles, updateFile } from "../controllers/fileController.js"
+import multer from "multer";
+
 
 const router = express.Router();
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
 
 
 // CREATE

@@ -16,7 +16,7 @@ export default function App() {
   const navigate = useNavigate();
 
   // Displayed directory name
-  const [directoryName, setDirectoryName] = useState("My Drive");
+  const [directoryName, setDirectoryName] = useState("All Files");
 
   // Lists of items
   const [directoriesList, setDirectoriesList] = useState([]);
@@ -80,7 +80,7 @@ export default function App() {
       const data = await response.json();
 
       // Set directory name
-      setDirectoryName(dirId ? data.name : "My Drive");
+      setDirectoryName(dirId ? data.name : "All Files");
 
       // Reverse directories and files so new items show on top
       setDirectoriesList([...data.directories].reverse());
@@ -126,6 +126,7 @@ export default function App() {
       return {
         file,
         name: file.name,
+        size: file.size,
         id: tempId,
         isUploading: false,
       };
@@ -167,7 +168,6 @@ export default function App() {
       return;
     }
 
-    // Take first item
     const [currentItem, ...restQueue] = queue;
 
     // Mark it as isUploading: true
@@ -181,7 +181,10 @@ export default function App() {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${BASE_URL}/file/${dirId || ""}`, true);
     xhr.withCredentials = true;
+
     xhr.setRequestHeader("filename", currentItem.name);
+
+
 
     xhr.upload.addEventListener("progress", (evt) => {
       if (evt.lengthComputable) {
@@ -191,17 +194,14 @@ export default function App() {
     });
 
     xhr.addEventListener("load", () => {
-      // Move on to the next item
       processUploadQueue(restQueue);
     });
 
     // If user cancels, remove from the queue
     setUploadXhrMap((prev) => ({ ...prev, [currentItem.id]: xhr }));
-    xhr.send(currentItem.file);
-    // const formData = new FormData();
-    // formData.append("file", currentItem.file);
 
-    // xhr.send(formData);
+    xhr.send(currentItem.file);
+  
   }
 
   /**
@@ -380,21 +380,6 @@ export default function App() {
     setShowRenameModal(false);
   }
 
-  // async function handleRenameSubmit(name) {
-  //   try {
-  //     if (renameType === "folder") {
-  //       await renameDirectory(renameId, name);
-  //     } else {
-  //       console.log("hi");
-  //       await renameFile(renameId, name);
-  //     }
-  //     setShowRenameModal(false);
-  //     // refetchData();
-  //   } catch (err) {
-  //     setErrorMessage(err.message);
-  //   }
-  // }
-
 
   async function handleRenameSubmit(e) {
     e.preventDefault();
@@ -429,7 +414,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen bg-[#f8fafd] overflow-hidden">
+    <div className="flex h-screen  overflow-hidden">
       <Sidebar
         directoryName={directoryName}
         onUploadFilesClick={() => {
@@ -462,16 +447,17 @@ export default function App() {
             <div className="error-message">{errorMessage}</div>
           )}
 
-        <main className="p-4 h-full bg-white mb-2 mr-4 ml-4 rounded-2xl overflow-y-auto">
+        <main className="p-3 h-full bg-white mb-2 mr-4 ml-4 overflow-y-auto">
           <FileGrid
           directoryName={directoryName}
           handleContextMenu={handleContextMenu}
           handleDeleteDirectory={handleDeleteDirectory}
           handleDeleteFile={handleDeleteFile}
+          handleCancelUpload={handleCancelUpload}
           openRenameModal={openRenameModal}
           BASE_URL={BASE_URL}
           setActiveContextMenu={setActiveContextMenu}
-
+          progressMap={progressMap}
           handleRowClick={handleRowClick}
           folders={directoriesList}
           files={filesList}
