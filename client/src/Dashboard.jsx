@@ -8,6 +8,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { BASE_URL, getUniquename } from "./utility/index.js";
 
 export default function App() {
+  const [authChecked, setAuthChecked] = useState(false);
+
   // Context menu
   const [showProfile, setShowProfile] = useState(false);
   const [showNewMenu, setShowNewMenu] = useState(false);
@@ -72,7 +74,8 @@ export default function App() {
       });
 
       if (response.status === 401) {
-        navigate("/login");
+        // navigate("/login");
+        setErrorMessage("Not authenticated yet");
         return;
       }
 
@@ -91,12 +94,13 @@ export default function App() {
   }
 
   useEffect(() => {
+    if (!authChecked) return;
     getDirectoryItems();
     // Reset context menu
     setActiveContextMenu(null);
     setActiveContextMenu(null);
     setContextMenu(null);
-  }, [dirId]);
+  }, [dirId, authChecked]);
   
   /**
    * Decide file icon
@@ -437,6 +441,8 @@ export default function App() {
       {/* <Header /> */}
       <div className="flex-1 flex flex-col">
         <Topbar
+        authChecked={authChecked}
+        setAuthChecked = {setAuthChecked}
           onProfileToggle={() => setShowProfile(prev => !prev)}
           showProfile={showProfile}
           onProfileClose={() => setShowProfile(false)}

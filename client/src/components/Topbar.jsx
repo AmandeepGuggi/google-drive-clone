@@ -8,7 +8,9 @@ import { BASE_URL } from "../utility";
 export default function Topbar({
   showProfile,
   onProfileClose,
-  onProfileToggle
+  onProfileToggle,
+  authChecked,
+  setAuthChecked
 }) {
 
   const profileRef = useRef(null);
@@ -17,6 +19,8 @@ export default function Topbar({
    const [loggedIn, setLoggedIn] = useState(false);
   const [userName, setUserName] = useState("Guest User");
   const [userEmail, setUserEmail] = useState("guest@example.com");
+
+
 
   useEffect(() => {
   if (!showProfile) return;
@@ -43,21 +47,25 @@ export default function Topbar({
           setUserName(data.name);
           setUserEmail(data.email);
           setLoggedIn(true);
-        } else if (response.status === 401) {
-          // User not logged in
-          setUserName("Guest User");
-          setUserEmail("guest@example.com");
-          setLoggedIn(false);
-        } else {
-          // Handle other error statuses if needed
-          console.error("Error fetching user info:", response.status);
-        }
+        } 
+        setAuthChecked(true);
+        // else if (response.status === 401) {
+        //   // User not logged in
+        //   setUserName("Guest User");
+        //   setUserEmail("guest@example.com");
+        //   setLoggedIn(false);
+        // } 
+        // else {
+        //   // Handle other error statuses if needed
+        //   console.error("Error fetching user info:", response.status);
+        // }
       } catch (err) {
         console.error("Error fetching user info:", err);
+        setAuthChecked(true);
       }
     }
     fetchUser();
-  }, [BASE_URL]);
+  }, []);
 
     const handleLogout = async () => {
       console.log("logout clicked");

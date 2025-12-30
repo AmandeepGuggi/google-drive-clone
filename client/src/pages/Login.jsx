@@ -4,9 +4,16 @@ import { useState } from "react";
 import {BASE_URL} from "../utility/index.js"
 
 export default function Login() {
+  const [showOtpModal, setShowOtpModal] = useState(false);
+const [otp, setOtp] = useState("");
+const [isSendingOtp, setIsSendingOtp] = useState(false);
+const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+
+
+
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: "anurag@gmail.com",
+    email: "a2guggi11052002@gmail.com",
     password: "Abcd@12345",
   });
   const [serverError, setServerError] = useState("");
@@ -29,6 +36,7 @@ export default function Login() {
      e.preventDefault();
 
     try {
+      setIsSendingOtp(true);
       const response = await fetch(`${BASE_URL}/user/login`, {
         method: "POST",
         body: JSON.stringify(formData),
@@ -41,14 +49,67 @@ export default function Login() {
       const data = await response.json();
       if (data.error) {
         setServerError(data.error);
-      } else if(response.status===201) {
-         navigate("/directory");
-      }
+      } 
+      // else if(response.status===201) {
+      //    navigate("/directory");
+      // }
+      else if (data.otpRequired) {
+  setShowOtpModal(true); // 🔑 open popup
+}
+
     } catch (error) {
       console.error("Error:", error);
       setServerError("Something went wrong. Please try again.");
     }
   }
+  const handleOtpSubmit = async () => {
+  const res = await fetch(`${BASE_URL}/otp/verify-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      email: formData.email,
+      otp
+    }),
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    navigate("/directory"); // ✅ ONLY HERE
+  } else {
+    alert("Invalid OTP");
+  }
+};
+
+const handleVerifyOtp = async () => {
+  try {
+    setIsVerifyingOtp(true);
+
+    const res = await fetch(`${BASE_URL}/user/login-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        email: formData.email,
+        otp,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Invalid OTP");
+      return;
+    }
+
+    navigate("/directory");
+
+  } finally {
+    setIsVerifyingOtp(false);
+  }
+};
+
   
 
   return (
@@ -103,9 +164,23 @@ export default function Login() {
           {serverError && <span className="text-red-700">{serverError}</span>}
         </div>
 
-        <button type="submit" className="w-full rounded-full bg-blue-600 py-2 text-white hover:bg-blue-700">
-          Login
-        </button>
+        {/* <button type="submit" className="w-full rounded-full bg-blue-600 py-2 text-white hover:bg-blue-700">
+          Login with otp
+        </button> */}
+        <button
+  type="submit"
+  disabled={isSendingOtp || showOtpModal}
+  className={`w-full rounded-full py-2 text-white
+    ${
+      isSendingOtp || showOtpModal
+        ? "bg-blue-300 cursor-not-allowed"
+        : "bg-blue-600 hover:bg-blue-700"
+    }
+  `}
+>
+  {isSendingOtp ? "Sending OTP..." : "Login with OTP"}
+</button>
+
       </form>
 
         <p className="mt-6 text-center text-sm text-gray-600">
@@ -118,6 +193,44 @@ export default function Login() {
           </span>
         </p>
       </div>
+{showOtpModal && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+    <div className="bg-white p-6 rounded-lg w-80">
+      <h3 className="text-lg font-semibold mb-3">Enter OTP</h3>
+
+      <input
+        type="text"
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
+        className="w-full border px-3 py-2 mb-4"
+        placeholder="6-digit OTP"
+      />
+
+      {/* <button
+        onClick={handleOtpSubmit}
+        className="w-full bg-blue-600 text-white py-2 rounded"
+      >
+        Verify OTP
+      </button> */}
+      <button
+  onClick={handleVerifyOtp}
+  disabled={isVerifyingOtp}
+  className={`w-full py-2 rounded text-white
+    ${
+      isVerifyingOtp
+        ? "bg-blue-300 cursor-not-allowed"
+        : "bg-blue-600"
+    }
+  `}
+>
+  {isVerifyingOtp ? "Verifying..." : "Verify OTP"}
+</button>
+
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }
