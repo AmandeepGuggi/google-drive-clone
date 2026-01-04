@@ -34,28 +34,24 @@ export default function Topbar({
   return () => document.removeEventListener("mousedown", handleOutside);
 }, [showProfile]);
 
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const response = await fetch(`${BASE_URL}/user/`, {
-          method: "post",
-          credentials: "include",
-        });
-        if (response.ok) {
-          const data = await response.json();
-          // Set user info if logged in
-          setUserName(data.name);
-          setUserEmail(data.email);
-          setLoggedIn(true);
-        } 
-        setAuthChecked(true);
-      } catch (err) {
-        console.error("Error fetching user info:", err);
-        setAuthChecked(false);
-      }
-    }
-    fetchUser();
-  }, []);
+async function getUser(params) {
+
+  const response = await fetch(`http://localhost:4000/user/`, {
+    method: "POST",
+    credentials: "include"
+  })
+  if(response.status===200){
+    data = await response.json()
+    console.log(data);
+    setUserName(data.name)
+    setUserEmail(data.email)
+
+  }
+}
+
+useEffect(()=> {
+getUser()
+},[])
 
     const handleLogout = async () => {
       console.log("logout clicked");

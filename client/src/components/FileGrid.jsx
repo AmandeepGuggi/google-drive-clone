@@ -41,7 +41,7 @@ progressMap,
       >
         {directoryName}{" "}
         <span className="text-sm text-gray-400 font-extralight">
-          (1,023 files)
+          (0 files)
         </span>
       </h1>
 

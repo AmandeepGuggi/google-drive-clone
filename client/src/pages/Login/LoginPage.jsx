@@ -71,13 +71,8 @@ const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
             setIsSubmitting(false)
           } 
           else if(response.status===201) {
-
-
-            setTimeout(()=> {    //this is temporary jugad of actual problem
-               navigate("/directory");
+              navigate("/directory");
              setIsSubmitting(false)
-             console.log("time");
-            }, 5000)
           }
             
     

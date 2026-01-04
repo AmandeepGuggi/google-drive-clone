@@ -1,8 +1,7 @@
+import dotenv from "dotenv";
+dotenv.config();
 import "./config/mongooseDb.js"
 import express from "express";
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import directoryRoutes from "./routes/directoryRoutes.js"
@@ -10,20 +9,13 @@ import fileRoutes from "./routes/fileRoutes.js"
 import userRoutes from "./routes/userRoutes.js";
 import checkAuthMiddleware from "./auth/checkAuthMiddleware.js";
 import authRoutes from "./routes/authRoutes.js"
+// import cookieParser from "cookie-parser";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-dotenv.config({
-  path: path.resolve(__dirname, "../.env"),
-  debug: false,
-  quiet: true 
-});
-
-const SecretKey = process.env.SecretKey
+const SecretKey = "storageDrive-guggi-123#"
 try {
   const app = express();
-app.use(cookieParser(SecretKey));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.json());
 app.use(
   cors({

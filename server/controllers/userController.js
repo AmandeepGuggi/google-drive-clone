@@ -39,7 +39,9 @@ export const registerUser = async (req, res, next) => {
     if(!otpRecord){
         res.status(400).json({error: "Invalid or expired OTP"});
     }
-    await otpRecord.deleteOne()
+    if(otpRecord){
+      await otpRecord.deleteOne()
+    }
 
 
     const userRootDirId = new mongoose.Types.ObjectId();
@@ -91,107 +93,12 @@ export const registerUser = async (req, res, next) => {
 
 }
 
-export const loginUser = async (req, res, next) => {
-  const { email, password, remeberMe } = req.body
-  const foundUser = await User.findOne({ email });
-  if (!foundUser) {
-    return res.status(409).json({
-      error: "Email or password did not match",
-      message: "No user exists with this email account or wrong email/password entered."
-    })
-  }
- 
-try{
-
-  const isPasswordValid = await foundUser.comparePassword(password)
-
-  if (!isPasswordValid) {
-    return res.status(404).json({ error: 'Invalid Credentials' })
-  }
-
-  const allSession = await Session.find({userId: foundUser.id})
-  console.log("allSession:", allSession);
-  if(allSession.length >= 2){
-    await allSession[0].deleteOne()
-  }
-
-  const session = await Session.create({userId: foundUser._id})
- 
-  res.cookie('sid', session.id, {
-    httpOnly: true,
-    signed: true,
-    maxAge: remeberMe? 1000 * 60 * 60 * 24 * 7 : 1000 * 60 * 60 * 24 ,
-  })
-  res.status(201).json({ message: 'logged in' })
-}catch(err){
-  console.log("login err is", err);
-  res.end()
-}
-}
-
-
-export const loginWithOtp = async (req, res) => {
-  const { email, otp } = req.body;
-
-  try {
-    // 1️⃣ Validate OTP again (never trust frontend flow)
-    const otpRecord = await OTP.findOne({ email, otp });
-    if (!otpRecord) {
-      return res.status(400).json({
-        error: "Invalid or expired OTP",
-      });
-    }
-
-    // 2️⃣ OTP is valid → remove it (one-time means one-time)
-    await OTP.deleteOne({ _id: otpRecord._id });
-
-    // 3️⃣ Fetch user
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({
-        error: "User not found",
-      });
-    }
-
-    // 4️⃣ Enforce session limit
-    const allSessions = await Session.find({ userId: user._id });
-    if (allSessions.length >= 2) {
-      await allSessions[0].deleteOne();
-    }
-
-    // 5️⃣ Create session
-    const session = await Session.create({
-      userId: user._id,
-    });
-
-    // 6️⃣ Set auth cookie
-    res.cookie("sid", session.id, {
-      httpOnly: true,
-      signed: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-    });
-
-    return res.status(200).json({
-      message: "Login successful",
-    });
-
-  } catch (err) {
-    console.error("login-otp error:", err);
-    return res.status(500).json({
-      error: "OTP login failed",
-    });
-  }
-};
-
-
-
 // export const loginUser = async (req, res, next) => {
-//   const { email, password } = req.body
+//   const { email, password, remeberMe } = req.body
 //   const foundUser = await User.findOne({ email });
-//   console.log(foundUser);
 //   if (!foundUser) {
 //     return res.status(409).json({
-//       error: "Invalid Credentials",
+//       error: "Email or password did not match",
 //       message: "No user exists with this email account or wrong email/password entered."
 //     })
 //   }
@@ -205,18 +112,18 @@ export const loginWithOtp = async (req, res) => {
 //   }
 
 //   const allSession = await Session.find({userId: foundUser.id})
-//   console.log("allSession:", allSession);
-//   if(allSession.length >= 2)
-//   {
+//   if(allSession.length >= 2){
 //     await allSession[0].deleteOne()
 //   }
 
 //   const session = await Session.create({userId: foundUser._id})
-
+ 
 //   res.cookie('sid', session.id, {
 //     httpOnly: true,
 //     signed: true,
-//     maxAge: 1000 * 60 * 60 * 24 * 7 ,
+//     maxAge: remeberMe? 1000 * 60 * 60 * 24 * 7 : 1000 * 60 * 60 * 24 ,
+//      sameSite: "lax",   // REQUIRED
+//   path: "/",
 //   })
 //   res.status(201).json({ message: 'logged in' })
 // }catch(err){
@@ -224,6 +131,101 @@ export const loginWithOtp = async (req, res) => {
 //   res.end()
 // }
 // }
+
+
+// export const loginWithOtp = async (req, res) => {
+//   const { email, otp } = req.body;
+
+//   try {
+//     // 1️⃣ Validate OTP again (never trust frontend flow)
+//     const otpRecord = await OTP.findOne({ email, otp });
+//     if (!otpRecord) {
+//       return res.status(400).json({
+//         error: "Invalid or expired OTP",
+//       });
+//     }
+
+//     // 2️⃣ OTP is valid → remove it (one-time means one-time)
+//     await OTP.deleteOne({ _id: otpRecord._id });
+
+//     // 3️⃣ Fetch user
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(404).json({
+//         error: "User not found",
+//       });
+//     }
+
+//     // 4️⃣ Enforce session limit
+//     const allSessions = await Session.find({ userId: user._id });
+//     if (allSessions.length >= 2) {
+//       await allSessions[0].deleteOne();
+//     }
+
+//     // 5️⃣ Create session
+//     const session = await Session.create({
+//       userId: user._id,
+//     });
+
+//     // 6️⃣ Set auth cookie
+//     res.cookie("sid", session.id, {
+//       httpOnly: true,
+//       signed: true,
+//       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+//     });
+
+//     return res.status(200).json({
+//       message: "Login successful",
+//     });
+
+//   } catch (err) {
+//     console.error("login-otp error:", err);
+//     return res.status(500).json({
+//       error: "OTP login failed",
+//     });
+//   }
+// };
+
+
+
+export const loginUser = async (req, res, next) => {
+  const { email, password } = req.body
+  const foundUser = await User.findOne({ email });
+  console.log(foundUser);
+  if (!foundUser) {
+    return res.status(409).json({
+      error: "Invalid Credentials",
+      message: "No user exists with this email account or wrong email/password entered."
+    })
+  }
+ 
+try{
+
+  const isPasswordValid = await foundUser.comparePassword(password)
+
+  if (!isPasswordValid) {
+    return res.status(404).json({ error: 'Invalid Credentials' })
+  }
+
+  const allSession = await Session.find({userId: foundUser.id})
+  if(allSession.length >= 2)
+  {
+    await allSession[0].deleteOne()
+  }
+
+  const session = await Session.create({userId: foundUser._id})
+
+  res.cookie('sid', session.id, {
+    httpOnly: true,
+    signed: true,
+    maxAge: 1000 * 60 * 60 * 24 * 7 ,
+  })
+  res.status(201).json({ message: 'logged in' })
+}catch(err){
+  console.log("login err is", err);
+  res.end()
+}
+}
 
 export const logout = async (req, res) => {
   const { sid } = req.signedCookies;
