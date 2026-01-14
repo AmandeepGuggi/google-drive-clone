@@ -177,3 +177,33 @@ export const getBinFolders = async (req, res) => {
 
   res.json(folders);
 };
+
+export async function getDirectoryBreadcrumbs(req, res) {
+  const { id } = req.params;
+  const userId = req.user._id;
+
+  const breadcrumbs = [];
+  let currentId = id;
+
+  while (currentId) {
+    const dir = await Directory.findOne({
+      _id: currentId,
+      userId: req.user._id,
+      isDeleted: false,
+    }).select("_id name parentDirId");
+
+    if (!dir) break;
+
+    breadcrumbs.push({
+      id: dir._id,
+      name: dir.name,
+    });
+
+    currentId = dir.parentDirId;
+  }
+
+  // Virtual root
+  // breadcrumbs.push({ id: null, name: });
+
+  res.json(breadcrumbs.reverse());
+}

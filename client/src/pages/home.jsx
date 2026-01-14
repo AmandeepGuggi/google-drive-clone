@@ -16,6 +16,38 @@ const [sortOrder, setSortOrder] = useState("asc");
   const [menuState, setMenuState] = useState(null);
   const { dirId } = useParams();
   const navigate = useNavigate();
+  const [breadcrumbs, setBreadcrumbs] = useState([]);
+
+
+async function buildBreadcrumbs(currentDirId) {
+  const path = [];
+  let cursor = currentDirId;
+console.log(cursor);
+  while (cursor) {
+    const res = await fetch(`${BASE_URL}/directory/${cursor}/breadcrumbs`, {
+      credentials: "include",
+    });
+
+    if (!res.ok) break;
+
+    const data = await res.json();
+    setBreadcrumbs(data)
+
+    path.push({
+      id: data.id,
+      name: data.name,
+    });
+
+    cursor = data.parentId; // climb upward
+  }
+
+  // Root
+  path.push({ id: null, name: "All Files" });
+
+  return path.reverse();
+}
+
+console.log({breadcrumbs});
 
  // Displayed directory name
 const [directoryName, setDirectoryName] = useState("My Files");
@@ -101,6 +133,10 @@ const [directoryName, setDirectoryName] = useState("My Files");
 
     useEffect(() => {
         getDirectoryItems();
+
+         (async () => {
+    const crumbs = await buildBreadcrumbs(dirId || null);
+  })();
         // Reset context menu
         setActiveContextMenu(null);
         setActiveContextMenu(null);
@@ -691,13 +727,44 @@ return 0;
 </div>
     </div>
 
-      <div className="px-3 pb-2">
-    <h1 className="text-[22px] font-medium text-gray-700">
-      {directoryName}
-    </h1>
-    <p className="text-sm text-gray-400">
+    <div className="px-3 pb-1 w-full bg-white border border-gray-300  rounded">
+  <nav className="flex items-center text-sm text-gray-500 gap-1">
+    {breadcrumbs.map((item, idx) => {
+      const isLast = idx === breadcrumbs.length - 1;
+
+      return (
+        <div key={item.id ?? "root"} className="flex pt-2 items-center gap-1">
+          {!isLast ? (
+            <span
+              onClick={() =>
+                navigate(item.id ? `/app/${item.id}` : `/app`)
+              }
+              className="cursor-pointer hover:text-black"
+            >
+              {item.name}
+            </span>
+          ) : (
+            <span className="text-gray-800 font-medium">
+              {item.name}
+            </span>
+          )}
+
+          {!isLast && <span className="mx-1">{">"}</span>}
+        </div>
+      );
+    })}
+  </nav>
+   <p className="text-sm text-gray-400">
       {sortedItems.length} items
     </p>
+</div>
+
+
+      <div className="px-3 pb-2">
+   
+    {/* <p className="text-sm text-gray-400">
+      {sortedItems.length} items
+    </p> */}
   </div>
 
   {view === "list" && (

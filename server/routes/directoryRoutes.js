@@ -1,6 +1,6 @@
 import express from "express";
 
-import { createDirectory, deleteFolderPermanently, getBinFolders, getDirectorybyId, getStarredDirectories, moveFolderToBin, renameDirectory, restoreFolder, toggleDirectoryStar } from "../controllers/directoryController.js";
+import { createDirectory, deleteFolderPermanently, getBinFolders, getDirectoryBreadcrumbs, getDirectorybyId, getStarredDirectories, moveFolderToBin, renameDirectory, restoreFolder, toggleDirectoryStar } from "../controllers/directoryController.js";
 
 
 const router = express.Router();
@@ -18,6 +18,7 @@ router.patch('/', renameDirectory);
 
 
 router.patch('/:id/starred', toggleDirectoryStar);
+router.get('/:id/breadcrumbs', getDirectoryBreadcrumbs);
 
 // DELETE
 router.delete("/:id/permanently", deleteFolderPermanently);
