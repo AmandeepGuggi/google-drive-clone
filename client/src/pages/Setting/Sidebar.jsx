@@ -4,12 +4,12 @@ import { User, Lock, Bell, Shield, HardDrive, Palette } from "lucide-react"
 
 export default function Sidebar({ activeTab, onTabChange }) {
   const menuItems = [
-    { id: "profile", label: "Profile", icon: User },
-    { id: "accounts", label: "Accounts", icon: Lock },
-    { id: "notification", label: "Notifications", icon: Bell },
-    { id: "privacy", label: "Privacy", icon: Shield },
-    { id: "storage", label: "Storage", icon: HardDrive },
-    { id: "appearance", label: "Appearance", icon: Palette },
+    { id: "accounts", label: "Accounts", icon: Lock , description: "Security and authentication"},
+    { id: "profile", label: "Profile", icon: User, description: "Personal details" },
+    { id: "notification", label: "Notifications", icon: Bell, description: "Email and push alerts" },
+    { id: "privacy", label: "Privacy", icon: Shield, description: "Data visibility" },
+    { id: "storage", label: "Storage", icon: HardDrive , description: "Storage settings"},
+    { id: "appearance", label: "Appearance", icon: Palette, description: "Theme and display" },
   ]
 
   return (
@@ -23,12 +23,15 @@ export default function Sidebar({ activeTab, onTabChange }) {
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors ${
-                isActive ? "bg-blue-100 text-blue-700" : "text-gray-700 hover:bg-gray-100"
+              className={`w-full flex  gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors ${
+                isActive ? "bg-kala text-white" : "text-gray-700 hover:bg-gray-100"
               }`}
             >
-              <Icon className="w-5 h-5" />
-              {item.label}
+              <Icon className="w-5 h-5 mt-1.5" />
+              <div className="flex flex-col items-baseline" >
+                <span>{item.label}</span>
+                <span className="text-[12px] font-extralight text-start" > {item.description} </span>
+              </div>
             </button>
           )
         })}

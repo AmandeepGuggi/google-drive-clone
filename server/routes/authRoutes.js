@@ -1,6 +1,8 @@
 import express from "express"
 const router = express.Router()
 import { sendOtp, sendRegisterOtp, verifyOtp, loginWithGoogle, githubCallback } from "../controllers/authController.js";
+import { getLoggedInDevices } from "../controllers/sessionController.js";
+import checkAuth from "../auth/checkUserAuth.js";
 
 router.post('/send-otp', sendOtp)
 
@@ -11,5 +13,7 @@ router.post('/verify-otp', verifyOtp)
 router.post('/google', loginWithGoogle)
 
 router.get('/github/callback', githubCallback)
+
+router.get('/devices',checkAuth, getLoggedInDevices)
 
 export default router;

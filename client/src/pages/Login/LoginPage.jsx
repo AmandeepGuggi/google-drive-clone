@@ -15,8 +15,8 @@ const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
-      email: "a2guggi11052002@gmail.com",
-      password: "Abcd@12345",
+      email: "",
+      password: "",
       rememberMe: false
     });
     const [serverError, setServerError] = useState("");
@@ -217,7 +217,7 @@ const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
                 <FolderOpen className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900">Cloudex</span>
+              <span className="text-xl font-bold tracking-tight text-slate-900">CloudVault</span>
             </div>
             <nav className=" items-center gap-8 md:flex">
              
@@ -228,8 +228,11 @@ const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
           </div>
         </div>
       </header>
-      {/* Main */}
+      <main className="my-auto">
+
        {renderScreen()}
+      </main>
+     
      
     </div>
   );

@@ -93,7 +93,6 @@ const [directoryName, setDirectoryName] = useState("My Files");
         setErrorMessage(error.message);
       }
     }
-    console.log(filesList);
    useEffect(() => {
   const close = () => setMenuState(null);
   window.addEventListener("scroll", close, true);
@@ -508,37 +507,6 @@ return 0;
   }
 }
 
-const renderFileVisual = (item) => {
-  // Folder
-  if (item.size === undefined) {
-    return <FaFolder className="text-5xl text-blue-400 shrink-0" />;
-  }
-
-  // File with preview
-  if (item.preview) {
-    return (
-      <img
-        src={`${BASE_URL}${item.preview}`}
-        alt={item.name}
-        className="w-full h-full object-contain p-2"
-      />
-    );
-  }
-
-  // File without preview → icon
-  return (
-    <img
-      src={getFileIcon(item.name)}
-      alt={item.name}
-      className="w-10 h-10 shrink-0"
-    />
-  );
-};
-
-
-function previewUrl(file) {
-  return `${BASE_URL}/file/preview/${file._id}`;
-}
 
   
  
@@ -565,7 +533,7 @@ function previewUrl(file) {
       fileInputRef.current.click();
     }}
     className="flex items-center gap-2 px-4 py-2 text-sm font-medium
-               rounded-md bg-blue-primary text-white hover:bg-blue-700"
+               rounded-md bg-kala text-white hover:bg-blue-700"
   >
     <Upload size={16} />
     Upload File
@@ -630,7 +598,7 @@ function previewUrl(file) {
       fileInputRef.current.click();
     }}
     className="flex items-center gap-2 px-4 py-2 text-sm font-medium
-               rounded-md bg-blue-primary text-white hover:bg-blue-700"
+               rounded-md bg-kala text-white hover:bg-black-700"
   >
     <Upload size={16} />
     Upload File
@@ -689,7 +657,7 @@ function previewUrl(file) {
       <button
         onClick={() => setView("grid")}
         className={`p-2 rounded ${
-          view === "grid" ? "bg-blue-primary text-white shadow" : ""
+          view === "grid" ? "bg-kala text-white shadow" : ""
         }`}
       >
         <LayoutGrid size={18} />
@@ -697,7 +665,7 @@ function previewUrl(file) {
       <button
         onClick={() => setView("list")}
         className={`p-2 rounded ${
-          view === "list" ? "bg-blue-primary text-white shadow" : ""
+          view === "list" ? "bg-kala text-white shadow" : ""
         }`}
       >
         <List size={18} />
@@ -738,6 +706,8 @@ function previewUrl(file) {
       const isUploadingItem = 
   !item.isDirectory && item.id.startsWith("temp-");
 const uploadProgress = progressMap[item.id] || 0;
+const icon = getFileIcon(item.name)
+debugger
       return (
       
     <div
@@ -782,9 +752,9 @@ const uploadProgress = progressMap[item.id] || 0;
   <div className="flex justify-between items-center gap-3">
     <div className="flex items-center gap-2 truncate">
       {item.size === undefined ? (
-        <FaFolder className="text-4xl text-blue-400 shrink-0" />
-      ) : (
-        <img src={getFileIcon(item.name)} className="w-10 shrink-0" />
+        <FaFolder className="text-4xl text-kala shrink-0" />
+      ) : ( 
+          icon && <img src={getFileIcon(item.name)} className="w-5 shrink-0" /> 
       )}
 
       <div className="flex flex-col truncate">
@@ -880,6 +850,7 @@ const uploadProgress = progressMap[item.id] || 0;
       const isUploadingItem = 
   !item.isDirectory && item.id.startsWith("temp-");
 const uploadProgress = progressMap[item.id] || 0;
+
       return (
       
     <div
@@ -926,7 +897,7 @@ const uploadProgress = progressMap[item.id] || 0;
         <div  className="border group border-gray-300 rounded-lg px-4 py-1 cursor-pointer hover:bg-gray-50">
          <div className="flex justify-between w-full">
            <div className="flex items-center gap-2 min-w-0"> 
-            <FaFolder className="text-4xl text-blue-400 shrink-0" />
+            <FaFolder className="text-4xl text-black shrink-0" />
              <div className="flex flex-col truncate min-w-0">
         <p className="text-sm truncate">{item.name}</p>
       </div>
@@ -1016,8 +987,9 @@ const uploadProgress = progressMap[item.id] || 0;
       const isUploadingItem = 
   !item.isDirectory && item.id.startsWith("temp-");
 const uploadProgress = progressMap[item.id] || 0;
+const icon = getFileIcon(item.name);
+
       return (
-      
     <div
   key={item.id}
 
@@ -1065,7 +1037,7 @@ const uploadProgress = progressMap[item.id] || 0;
        <div className="flex flex-col w-full">
           <div className="flex justify-between w-full">
            <div className="flex items-center gap-2 min-w-0"> 
-            <img src={getFileIcon(item.name)} className="w-5 shrink-0" />
+          { icon && <img src={getFileIcon(item.name)} className="w-5 shrink-0" /> }
              <div className="flex flex-col truncate min-w-0">
         <p className="text-sm truncate">{item.name}</p>
       </div>
@@ -1109,15 +1081,20 @@ const uploadProgress = progressMap[item.id] || 0;
     </div>
    
          </div>
-          {
-      item.preview ? <>
-      <div className=" w-full pt-1 h-40 overflow-hidden">
+
+    {item.preview && item.preview.trim() ? (
+   <div className=" w-full pt-1 h-40 overflow-hidden">
          <img src={`${BASE_URL}${item.preview}`} className="w-full h-full object-cover object-center shrink-0" />
       </div>
-       </> : <div className=" w-full pt-1 h-40 overflow-hidden" > 
+) : (
+  (() => {
+    const icon = getFileIcon(item.name);
+    return icon ?  <div className=" w-full pt-1 h-40 overflow-hidden" > 
        <img src={getFileIcon(item.name)} className="w-full h-full object-contain object-center shrink-0" />
-       </div>
-    }
+       </div> : null;
+  })()
+)}
+
        </div>
        </div>
         </div>
@@ -1220,10 +1197,12 @@ const uploadProgress = progressMap[item.id] || 0;
     <button
       onClick={onClick}
       className={`w-full text-left px-3 py-2 text-sm transition
-        ${active ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"}
+        ${active ? "bg-kala text-blue-700" : "hover:bg-gray-100"}
       `}
     >
       {label}
     </button>
   );
 }
+
+

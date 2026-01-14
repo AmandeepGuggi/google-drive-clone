@@ -2,20 +2,61 @@
 
 import { Lock, Smartphone, LogOut, Trash2, AlertCircle, X } from "lucide-react"
 import { useState } from "react"
+import { BASE_URL } from "../../../utility"
+import { useEffect } from "react"
 
 export function AccountSettings() {
   const [formData, setFormData] = useState({
-    username: "johndoe",
+    username: "Amandeep guggi",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   })
 
-  const [devices, setDevices] = useState([
-    { id: 1, name: "Chrome on Windows", lastActive: "2 hours ago", isCurrent: true },
-    { id: 2, name: "Safari on iPhone", lastActive: "1 day ago", isCurrent: false },
-    { id: 3, name: "Firefox on Mac", lastActive: "5 days ago", isCurrent: false },
-  ])
+  const [devices, setDevices] = useState([])
+  console.log(devices);
+  const formatTime = (date) =>
+  new Date(date).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short"
+  });
+
+  const timeAgo = (date) => {
+  const seconds = Math.floor((Date.now() - new Date(date)) / 1000);
+
+  if (seconds < 60) return "just now";
+
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} day${days !== 1 ? "s" : ""} ago`;
+
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} month${months !== 1 ? "s" : ""} ago`;
+
+  const years = Math.floor(months / 12);
+  return `${years} year${years !== 1 ? "s" : ""} ago`;
+};
+   const fetchLoggedInDevices = async () => {
+  const res = await fetch(`${BASE_URL}/auth/devices`, {
+    credentials: "include", // 🔑 important for cookies
+  });
+   const data = await res.json()
+   setDevices(data)
+   
+  if (!res.ok) {
+    throw new Error("Failed to fetch devices");
+  }
+  
+}
+
+useEffect(()=>{
+  fetchLoggedInDevices()
+}, [])
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteVerification, setDeleteVerification] = useState("")
@@ -53,17 +94,7 @@ export function AccountSettings() {
     }
   }
 
-  const handleDeleteAccount = () => {
-    if (deleteVerification.toLowerCase() === "delete my account" && deleteConfirmed) {
-      alert("Account deleted successfully. Redirecting...")
-      // Here you would typically call an API to delete the account
-      setShowDeleteModal(false)
-      setDeleteVerification("")
-      setDeleteConfirmed(false)
-    } else {
-      alert("Please confirm the verification requirements")
-    }
-  }
+
 
   return (
     <div className="space-y-8">
@@ -149,19 +180,26 @@ export function AccountSettings() {
         <div className="space-y-3 mb-4">
           {devices.map((device) => (
             <div
-              key={device.id}
+              key={device.sessionId}
               className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <Smartphone className="w-5 h-5 text-gray-400" />
-                <div>
+                <div className="group">
                   <p className="font-medium text-gray-900">
-                    {device.name}
-                    {device.isCurrent && (
+                    {device.deviceName}
+                    {device.isCurrentDevice && (
                       <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Current Device</span>
                     )}
                   </p>
-                  <p className="text-sm text-gray-500">Last active: {device.lastActive}</p>
+                  <p className="text-sm relative group text-gray-500 cursor-pointer">Last active: {timeAgo(device.lastActiveAt)}</p>
+                   <div
+    className="absolute  hidden group-hover:block
+               bg-gray-200 text-xs px-2 py-1 rounded shadow
+               whitespace-nowrap z-50"
+  >
+    {formatTime(device.lastActiveAt)}
+  </div>
                 </div>
               </div>
               {!device.isCurrent && (

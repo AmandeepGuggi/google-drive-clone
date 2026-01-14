@@ -95,8 +95,8 @@ export default function NameModal({
               className={`rounded-full px-4 py-2 text-sm text-white
     ${
       isDisabled
-        ? "bg-blue-300 cursor-not-allowed"
-        : "bg-blue-600 hover:bg-blue-700"
+        ? "bg-gray-200 cursor-not-allowed"
+        : "bg-kala hover:bg-balck-700"
     }`}
             >
              {actionLabel}

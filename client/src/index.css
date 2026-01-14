@@ -18,7 +18,9 @@
 .bg-blue-primary {
   background-color: #2563eb;
 }
-
+.bg-kala {
+  background-color: #171717;
+}
 
 @keyframes spin {
   to {

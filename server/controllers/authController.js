@@ -8,6 +8,18 @@ import {sendOtpService} from "../services/sendOtpService.js"
 import Directory from "../modals/directoryModal.js";
 import Session from "../modals/sessionModal.js";
 import { getGithubUser } from "../services/githubAuthService.js";
+import {UAParser} from "ua-parser-js";
+
+const parseDevice = (userAgent) => {
+  const parser = new UAParser(userAgent);
+  const result = parser.getResult();
+
+  const browser = result.browser.name || "Unknown Browser";
+  const os = result.os.name || "Unknown OS";
+
+  return `${browser} on ${os}`;
+};
+
 
 export const sendOtp = async (req, res) => {
     const { email } = req.body;
@@ -40,6 +52,7 @@ export const verifyOtp = async (req, res) => {
     res.json({msg: "otp verified"})
 }
 
+//experimental
 export const loginWithGoogle = async (req, res, next) => {
   // Implementation for Google login
   const { idToken } = req.body;
@@ -49,16 +62,32 @@ export const loginWithGoogle = async (req, res, next) => {
 
   let user = await User.findOne({ email }).select('-__v -createdAt -updatedAt -authProvider').lean();
   if (user) {
-     await Session.deleteMany({ userId: user._id });
-    res.clearCookie('sid')
+    const MAX_SESSIONS = 3;
+const activeSessions = await Session.find({
+  userId: user._id,
+  isRevoked: false,
+}).sort({ createdAt: 1 });
+
+if (activeSessions.length >= MAX_SESSIONS) {
+   await Session.deleteOne({ _id: activeSessions[0]._id });
+}
+
+    //  await Session.deleteMany({ userId: user._id });
+    // res.clearCookie('sid')
 
     if(!user.picture.includes("googleusercontent.com")) {
       user.picture = userData.picture;
       // await user.save()
       await User.updateOne({ _id: user._id }, { $set: { picture: userData.picture } })
     }
-
-    const loginSession = await Session.create([{ userId: user._id }])
+    const loginSession = await Session.create([{ 
+      userId: user._id,
+    userAgent: req.headers["user-agent"],
+  ipAddress: req.ip,
+  deviceName: parseDevice(req.headers["user-agent"]),
+  lastActiveAt: new Date(),
+  isRevoked: false,
+    }])
     const sid = loginSession[0]._id.toString()
   res.cookie('sid', sid, {
     httpOnly: true,
@@ -66,7 +95,7 @@ export const loginWithGoogle = async (req, res, next) => {
     sameSite: "lax",
     maxAge: 1000 * 60 * 60 * 24 * 7 ,
   })
-    res.status(201).json({ message: 'User Logged In', user })
+   return res.status(201).json({ message: 'User Logged In', user })
   }
   const mongooseSession = await mongoose.startSession();
 
@@ -120,6 +149,87 @@ export const loginWithGoogle = async (req, res, next) => {
   }
   // res.json({msg: "Google login endpoint hit", user})
 }
+
+// export const loginWithGoogle = async (req, res, next) => {
+//   // Implementation for Google login
+//   const { idToken } = req.body;
+//   const userData = await verifyIdToken(idToken)
+
+//   const { email } = userData;
+
+//   let user = await User.findOne({ email }).select('-__v -createdAt -updatedAt -authProvider').lean();
+//   if (user) {
+//      await Session.deleteMany({ userId: user._id });
+//     res.clearCookie('sid')
+
+//     if(!user.picture.includes("googleusercontent.com")) {
+//       user.picture = userData.picture;
+//       // await user.save()
+//       await User.updateOne({ _id: user._id }, { $set: { picture: userData.picture } })
+//     }
+
+//     const loginSession = await Session.create([{ userId: user._id }])
+//     const sid = loginSession[0]._id.toString()
+//   res.cookie('sid', sid, {
+//     httpOnly: true,
+//     signed: true,
+//     sameSite: "lax",
+//     maxAge: 1000 * 60 * 60 * 24 * 7 ,
+//   })
+//     res.status(201).json({ message: 'User Logged In', user })
+//   }
+//   const mongooseSession = await mongoose.startSession();
+
+//   // Start transaction properly
+//   mongooseSession.startTransaction();
+
+//   try {
+//     const userRootDirId = new mongoose.Types.ObjectId();
+//      const userId = new mongoose.Types.ObjectId();
+     
+//     const newUser = await User.insertOne({
+//       _id: userId,
+//       fullname: userData.name,
+//       email: userData.email,
+//       picture: userData.picture,
+//       // password,
+//       authProvider: "google",
+//       // providerId: null,
+//       rootDirId: userRootDirId
+//     }, { mongooseSession })
+//    await Directory.create([{
+//       _id: userRootDirId,
+//       name: `root-${email}`,
+//       parentDirId: null,
+//       userId,
+//       isDirectory: true
+//     }], { mongooseSession })
+
+    
+   
+//     // await Session.deleteMany({ userId: newUser._id }); 
+//     // res.clearCookie('sid')
+//     const loginSession = await Session.create([{ userId: newUser._id }], { mongooseSession })
+
+//     console.log(loginSession), loginSession[0]._id.toString();
+//     const sid = loginSession[0]._id.toString()
+//   res.cookie('sid', sid, {
+//     httpOnly: true,
+//     signed: true,
+//     sameSite: "lax",
+//     maxAge: 1000 * 60 * 60 * 24 * 7 ,
+//   })
+//    await mongooseSession.commitTransaction();
+//   console.log("loginSession created", req.signedCookies);
+//   res.status(201).json({ message: 'User Registered and logged in', sid })
+    
+//   } catch (err) {
+//     next(err)
+//   } finally {
+//     await mongooseSession.endSession();
+//   }
+//   // res.json({msg: "Google login endpoint hit", user})
+// }
 
 export const githubCallback = async (req, res, next) => {
   const { code } = req.query;

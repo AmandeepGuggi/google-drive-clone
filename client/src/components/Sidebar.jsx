@@ -1,4 +1,4 @@
-import { FaStar, FaTrash, FaGoogleDrive, FaHome } from "react-icons/fa";
+import { FaStar, FaTrash, FaGoogleDrive, FaHome, FaCloud } from "react-icons/fa";
 import {
   FiHome,
   FiFolder,
@@ -29,8 +29,8 @@ export default function Sidebar({
     <>
       <aside className={` ${open ? "w-64" : "w-25"} transition-all duration-400 hidden border-r  border-gray-300  md:flex h-screen pb-4 pt-3 flex-col`}>
         <div className="flex items-center px-6 gap-2 border-b border-gray-300 pb-2 mb-6 text-xl font-poppins">
-          <p className={` ${open? "": "pb-2.5"} bg-blue-primary p-2 text-[12px] text-white font-extrabold rounded`}>
-            CV
+          <p className={` ${open? "": "pb-2.5"} bg-kala p-2 text-[12px] text-white font-extrabold rounded`}>
+            <FaCloud className="h-4 w-4" />
           </p>
          {open && 
           <p className="flex flex-col">
@@ -60,7 +60,7 @@ export default function Sidebar({
             <p>50.5%</p>
           </div>
           <div className="w-full bg-gray-300 rounded-2xl overflow-hidden h-2">
-            <div className="bg-blue-primary w-[50%] h-full "></div>
+            <div className="bg-kala w-[50%] h-full "></div>
           </div>
           <div className="text-gray-500 ">
             <p className="text-sm">
@@ -68,7 +68,7 @@ export default function Sidebar({
             </p>
           </div>
 
-          <div className="uppercase text-center py-2 mt-5 bg-blue-primary text-white rounded">Upgrade Storage</div>
+          <div className="uppercase text-center py-2 mt-5 bg-kala text-white rounded">Upgrade Storage</div>
         </div> : <div className="mt-auto flex justify-center pb-4">
   <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-black">
     50%
@@ -93,7 +93,7 @@ function NavItem({ to, icon, label, open, end = false }) {
         flex items-center gap-2  mb-2 rounded
         transition-colors cursor-pointer
         ${isActive
-          ? "bg-blue-primary text-white"
+          ? "bg-kala text-white"
           : "text-black hover:bg-gray-200"}
         `
       }

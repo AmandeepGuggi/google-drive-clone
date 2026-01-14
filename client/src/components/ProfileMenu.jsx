@@ -1,36 +1,21 @@
+import { HelpCircle, Settings } from "lucide-react";
 import {FaSignOutAlt} from "react-icons/fa";
 export default function ProfileMenu({ userEmail, loggedIn, userName, handleLogout}) {
   return (
-    <div  className="absolute right-4 top-14 w-64 md:w-84 bg-secondary box-shadow rounded-xl p-4 z-50">
-      <p className="text-gray-900 text-center">{userEmail} </p>
-  {/* <div className="rounded-full overflow-hidden w-20 h-20 mx-auto my-4 border border-gray-200">
-       <img src="/photo2.jpeg" alt="user" className="object-cover w-full h-full  "  />
-      </div> */}
-      <div className="rounded-full overflow-hidden w-20 h-20 mx-auto my-4 border border-gray-200 flex items-center justify-center bg-orange-400">
-  {userName ? (
-    <span className="text-3xl font-semibold text-white">
-      {userName.charAt(0).toUpperCase()}
-    </span>
-  ) : (
-    <img
-      src="/photo2.jpeg"
-      alt="user"
-      className="object-cover w-full h-full"
-    />
-  )}
-</div>
-
+    <div  className="absolute right-4 top-14 w-44 md:w-54 bg-white box-shadow rounded-xl z-50">
+      <p className="text-gray-900 text-sm px-4 pt-4">{userName} </p>
+      <p className="text-gray-600 text-[12px] px-4 pb-2 border-b border-gray-400">{userEmail} </p>
       
-      <p className="text-gray-900 text-center text-2xl">Hi, {userName} </p>
-      <button className="my-2 w-[70%] md:text-nowrap border text-sm px-2 flex items-center mx-auto border-black rounded-full py-2 text-blue-600">
-        Manage your Google Account
-      </button>
-      <div className="flex flex-col md:flex-row justify-between gap-1 mt-4">
-        <button className="text-gray-600  bg-white px-8 text-[14px] rounded-full md:rounded-r-none md:rounded-l-full text-nowrap py-2">
-         + Add account</button>
-        <button onClick={()=> handleLogout()} className=" text-gray-600 cursor-pointer bg-white px-8 text-[14px] rounded-full md:rounded-l-none md:rounded-r-full py-2 text-nowrap">
-          <FaSignOutAlt className="inline mr-2" />{loggedIn? "Logout": "LogIn"}</button>
-      </div>
+     <div className="flex gap-2 items-center cursor-pointer px-4 pt-2 text-sm">
+       <Settings className="text-gray-700 w-5 " /> Account settings
+     </div>
+     <div className="flex gap-2 items-center px-4 cursor-pointer pt-2 text-sm pb-2 border-b border-gray-400">
+       <HelpCircle className="text-gray-700 w-5 " /> Documentation
+     </div>
+     
+        <div onClick={()=> handleLogout()}  className="flex cursor-pointer gap-2 items-center px-4 pt-2 text-sm text-red-700 pb-2">
+       <FaSignOutAlt className="text-red-700 w-5 " /> {loggedIn? "Logout": "LogIn"}
+     </div>
     </div>
   );
 }

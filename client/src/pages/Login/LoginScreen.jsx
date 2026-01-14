@@ -1,10 +1,12 @@
 import React from "react";
-import { GoogleIcon } from "../../components/Icons/GoogleIcon";
 import { GoogleLogin } from "@react-oauth/google";
 import { GithubIcon } from "../../components/Icons/GithubIcon";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { loginWithGoogle } from "../../utility";
+import FloatingInput from "../../components/FloatingInput"
+import { MdEmail } from "react-icons/md"; 
+import { Eye, EyeOff } from "lucide-react";
 
 const LoginScreen = ({
   emailTxt,
@@ -18,6 +20,8 @@ const LoginScreen = ({
 }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+   const [focus, setFocus] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     function handleMessage(event) {
@@ -62,54 +66,62 @@ const githubLogin = () => {
 
 
   return (
-    <main className="flex items-center justify-center px-4 py-16">
+    <main className="flex items-center justify-center px-4 py-4">
       {loading && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
           <div className="bg-white px-4 py-2 rounded">Loading…</div>
         </div>
       )}
-      <div className="w-full max-w-md bg-white rounded-lg shadow-sm p-12">
-        <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
+      <div className="w-full max-w-[480px] bg-white rounded-lg shadow-sm p-10">
+        <h1 className="text-2xl font-bold text-center text-gray-900 mb-4">
           Sign In to Your Account
         </h1>
 
-        <form className="space-y-6" onSubmit={handleLoginSubmit}>
+        <form className="space-y-4 w-full" onSubmit={handleLoginSubmit}>
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-semibold text-gray-700 mb-2"
-            >
-              Email Address
-            </label>
-
-            <input
-              id="email"
-              type="email"
-              name="email"
-              value={emailTxt}
-              onChange={handleInputChange}
-              placeholder="Enter your email"
-              className="w-full h-12 px-4 border border-gray-300 rounded text-base focus:outline-none focus:border-[#0061D5]"
+            <FloatingInput 
+            icon={<MdEmail />}
+            name="email"
+            value={emailTxt}
+            onChange={handleInputChange}
+            label="Email Address"
+            type="email"
             />
           </div>
-          <div>
+           <div className="relative mb-6 w-full">
             <label
-              htmlFor="password"
-              className="block text-sm font-semibold text-gray-700 mb-2"
+              className={`absolute transition-all duration-200 pointer-events-none 
+        ${
+          focus
+            ? "-top-3 text-sm text-gray-500"
+            : "top-3 text-base text-gray-400"
+        }`}
             >
               Password
             </label>
 
             <input
-              id="password"
-              type="password"
-              name="password"
               value={passwordTxt}
               onChange={handleInputChange}
-              placeholder="Enter your password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              onFocus={() => setFocus(true)}
+              onBlur={(e) => e.target.value === "" && setFocus(false)}
+              className="w-full border-b-[1.5px] border-gray-300 focus:border-black outline-none py-3 text-gray-800 pr-8"
               required
-              className="w-full h-12 px-4 border border-gray-300 rounded text-base focus:outline-none focus:border-[#0061D5]"
             />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-0 top-3"
+            >
+              {showPassword ? (
+                <Eye className="text-gray-400" />
+              ) : (
+                <EyeOff className="text-gray-400" />
+              )}
+            </span>
+
+            {/* {<EyeOff /> && <span className="absolute right-0 top-3">{<Eye className="text-gray-400" />}</span>} */}
           </div>
           {serverError && <span className="text-red-700">{serverError}</span>}
           <button
@@ -155,10 +167,10 @@ const githubLogin = () => {
           </div>
         </form>
 
-        <div className="my-4">
+        <div className="my-1  gap-2 ">
           
 
-          <div className="flex w-full justify-center mb-2"> 
+          <div className="flex w-full mb-2"> 
             <GoogleLogin
             onSuccess={async (credentialResponse) => {
               const data = await loginWithGoogle(credentialResponse.credential);
@@ -167,14 +179,14 @@ const githubLogin = () => {
                 navigate("/app");
                 return;
               }
-              console.log(data);
               return;
             }}
+            width="500px"
             onError={() => {
               console.log("Login Failed");
             }}
             useOneTap
-            width="300"
+            
             logo_alignment="center"
             
           />
@@ -182,10 +194,10 @@ const githubLogin = () => {
 
           <button onClick={githubLogin}
             type="button"
-            className="w-full h-12 flex items-center justify-center gap-3 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+            className="w-full h-10 flex items-center justify-center gap-3 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
           >
             <GithubIcon />
-            <span className="text-gray-700 font-medium text-base">
+            <span className="text-gray-700 text-sm font-medium text-nowrap">
               Sign in with Github
             </span>
           </button>
