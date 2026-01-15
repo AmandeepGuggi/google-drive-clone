@@ -23,6 +23,9 @@ A **Google Drive–style file manager UI** built using **React** and **Tailwind 
 ### Desktop
 ![Desktop](client/src/assets/desktop.png)
 
+### Preview
+![Preview](client/src/assets/preview.png)
+
 ### Mobile
 ![Mobile](client/src/assets/mobile.png)
 
