@@ -11,7 +11,8 @@ export const getLoggedInDevices = async (req, res) => {
     }
 
     const sessions = await Session.find({
-      userId: req.user._id
+      userId: req.user._id,
+      isRevoked: false
     })
       .sort({ createdAt: -1 })
       .lean();
@@ -31,3 +32,4 @@ export const getLoggedInDevices = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch sessions" });
   }
 };
+

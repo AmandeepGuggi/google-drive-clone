@@ -9,6 +9,7 @@ import Bin from "./pages/Bin"
 import DashboardLayout from "./DashboardLayout"
 import Home from "./pages/home"
 import Settings from "./pages/Setting/Settings"
+import { AuthProvider } from "./context/AuthContext"
 
 const router = createBrowserRouter([
    {
@@ -42,7 +43,9 @@ const router = createBrowserRouter([
 
 const App = () => {
   return (
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   )
 }
 

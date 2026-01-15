@@ -1,6 +1,7 @@
 import express from "express";
 
 import { createDirectory, deleteFolderPermanently, getBinFolders, getDirectoryBreadcrumbs, getDirectorybyId, getStarredDirectories, moveFolderToBin, renameDirectory, restoreFolder, toggleDirectoryStar } from "../controllers/directoryController.js";
+import checkAuth from "../auth/checkUserAuth.js";
 
 
 const router = express.Router();
@@ -10,8 +11,8 @@ router.get("/bin", getBinFolders);
 router.get("/" , getDirectorybyId);
 router.get("/:id" , getDirectorybyId);
 
-router.post("/:parentDirId", createDirectory);
-router.post("/", createDirectory);
+router.post("/:parentDirId", checkAuth, createDirectory);
+router.post("/", checkAuth, createDirectory);
 
 router.patch('/:id', renameDirectory);
 router.patch('/', renameDirectory);

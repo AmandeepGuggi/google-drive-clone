@@ -115,9 +115,7 @@ export const loginWithGoogle = async (req, res, next) => {
         fullname: userData.name,
         email: userData.email,
         picture: userData.picture,
-        // password,
         authProvider: "google",
-        // providerId: null,
         rootDirId: userRootDirId,
         storageUsed: 0
       },
@@ -258,8 +256,15 @@ export const githubCallback = async (req, res, next) => {
     .select("-__v -createdAt -updatedAt -authProvider")
     .lean();
   if (user) {
-    await Session.deleteMany({ userId: user._id });
-    res.clearCookie("sid");
+    const MAX_SESSIONS = 3;
+    const activeSessions = await Session.find({
+      userId: user._id,
+      isRevoked: false,
+    }).sort({ createdAt: 1 });
+
+    if (activeSessions.length >= MAX_SESSIONS) {
+      await Session.deleteOne({ _id: activeSessions[0]._id });
+    }
 
     if (!user.picture.includes("googleusercontent.com")) {
       user.picture = userData.picture;
@@ -270,7 +275,14 @@ export const githubCallback = async (req, res, next) => {
       );
     }
 
-    const loginSession = await Session.create([{ userId: user._id }]);
+    const loginSession = await Session.create([{ 
+      userId: user._id ,
+     userAgent: req.headers["user-agent"],
+        ipAddress: req.ip,
+        deviceName: parseDevice(req.headers["user-agent"]),
+        lastActiveAt: new Date(),
+        isRevoked: false,
+    }]);
     const sid = loginSession[0]._id.toString();
     res.cookie("sid", sid, {
       httpOnly: true,
@@ -296,10 +308,9 @@ export const githubCallback = async (req, res, next) => {
         fullname: userData.name,
         email: userData.email,
         picture: userData.avatar_url,
-        // password,
         authProvider: "github",
-        // providerId: null,
         rootDirId: userRootDirId,
+        storageUsed: 0
       },
       { mongooseSession }
     );
@@ -311,6 +322,8 @@ export const githubCallback = async (req, res, next) => {
           parentDirId: null,
           userId,
           isDirectory: true,
+          isStarred: false,
+          isDeleted: false
         },
       ],
       { mongooseSession }
@@ -318,11 +331,18 @@ export const githubCallback = async (req, res, next) => {
 
     await Session.deleteMany({ userId: newUser._id });
     res.clearCookie("sid");
-    const loginSession = await Session.create([{ userId: newUser._id }], {
+    const loginSession = await Session.create([{ 
+      userId: newUser._id,
+       userAgent: req.headers["user-agent"],
+        ipAddress: req.ip,
+        deviceName: parseDevice(req.headers["user-agent"]),
+        lastActiveAt: new Date(),
+        isRevoked: false,   
+    }], {
       mongooseSession,
     });
 
-    console.log(loginSession), loginSession[0]._id.toString();
+   
     const sid = loginSession[0]._id.toString();
     res.cookie("sid", sid, {
       httpOnly: true,
@@ -333,10 +353,66 @@ export const githubCallback = async (req, res, next) => {
     await mongooseSession.commitTransaction();
     console.log("loginSession created", req.signedCookies);
     res.redirect(redirectURL);
-    res.status(201).json({ message: "User Registered and logged in", sid });
+    res.status(201).json({ message: "User Registered and logged in", user: newUser});
   } catch (err) {
     next(err);
   } finally {
     await mongooseSession.endSession();
   }
 };
+
+
+export const notification = async (req, res) => {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId);
+
+  const since = user.lastNotificationSeenAt || new Date(0);
+
+  const newLogins = await Session.find({
+    userId,
+    createdAt: { $gt: since }
+  }).sort({ createdAt: -1 });
+
+  const notifications = newLogins.map(session => ({
+    type: "NEW_DEVICE_LOGIN",
+    deviceName: session.deviceName,
+    time: session.createdAt
+  }));
+
+  res.json(notifications);
+}
+
+export const notificationSeen =  async (req, res) => {
+  await User.findByIdAndUpdate(req.user._id, {
+    lastNotificationSeenAt: new Date()
+  });
+
+  res.json({ success: true });
+}
+
+export const logoutDevice = async (req, res) => {
+ const { sessionId } = req.params;
+  const currentUserId = req.user._id; // set by auth middleware
+console.log(sessionId, currentUserId);
+  if (!sessionId) {
+    return res.status(400).json({ message: "Session ID is required" });
+  }
+
+  const session = await Session.findById(sessionId);
+
+  if (!session) {
+    return res.status(404).json({ message: "Session not found" });
+  }
+
+  // 🔒 Critical security check
+  if (session.userId.toString() !== currentUserId.toString()) {
+    return res.status(403).json({ message: "Not allowed to delete this session" });
+  }
+
+  await Session.findByIdAndDelete(sessionId);
+
+  return res.status(200).json({
+    message: "Device logged out successfully",
+  });
+}

@@ -1,6 +1,6 @@
 import express from "express";
 import checkAuth from "../auth/checkUserAuth.js";
-import { loginUser, logout, registerUser } from "../controllers/userController.js";
+import { loginUser, logout, logoutAll, registerUser } from "../controllers/userController.js";
 
 
 const router = express.Router();
@@ -19,6 +19,8 @@ router.get('/', checkAuth ,  (req, res) => {
   })
 })
 
-router.post('/logout', logout)
+router.post('/logout',checkAuth, logout)
+router.post('/logoutAll', checkAuth, logoutAll )
+
 
 export default router;

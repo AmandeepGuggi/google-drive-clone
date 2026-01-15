@@ -12,6 +12,7 @@ export default function Topbar({
   setShowProfile,
 }) {
 const wrapperRef = useRef(null);
+const popupRef = useRef(null);
 
    const navigate = useNavigate();
 
@@ -20,6 +21,26 @@ const wrapperRef = useRef(null);
   const [userEmail, setUserEmail] = useState("guest@example.com");
   const [profileSrc, setProfileSrc] = useState("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYfAWbelVtedtn8mYCajf5bYv6PJgyMxOR2g&s");
 
+  const [showNotifications, setShowNotifications] = useState(false);
+const [notification, setNotification] = useState([])
+const count = notification.length;
+const hasNotification = count > 0;
+
+const fetchNotifications = async () => {
+  const res = await fetch(`${BASE_URL}/auth/notifications`, {
+    credentials: "include",
+  });
+  const data = await res.json();
+  setNotification(data);
+};
+
+const clearNotifications = async () => {
+  await fetch(`${BASE_URL}/auth/notifications/seen`, {
+    method: "POST",
+    credentials: "include",
+  });
+  setNotification([]);
+};
 
   useEffect(() => {
   if (!showProfile) return;
@@ -64,6 +85,16 @@ async function getUser() {
 
 useEffect(()=> {
 getUser()
+ fetchNotifications();
+
+ function handleClickOutside(e) {
+    if (popupRef.current && !popupRef.current.contains(e.target)) {
+      setShowNotifications(false);
+    }
+  }
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
 },[])
 
     const handleLogout = async () => {
@@ -115,13 +146,66 @@ getUser()
 <div className="flex items-center gap-3 pl-3">
 
   {/* Settings and Bell — desktop only */}
-    <button
-    className=" md:flex items-center justify-center w-9 h-9 rounded-md text-black hover:text-gray-700 hover:bg-gray-100 transition"
+    <div className="relative" ref={popupRef}>
+  <button
+    className="relative flex items-center justify-center w-9 h-9 rounded-md
+               text-black hover:text-gray-700 hover:bg-gray-100 transition"
     aria-label="Notifications"
-    onClick={() => navigate("/notifications")}
+    onClick={() => setShowNotifications((prev) => !prev)}
   >
     <Bell size={18} />
+
+    {hasNotification && (
+      <span
+        className="absolute top-1 right-1 flex items-center justify-center
+                   w-3 h-3 text-[10px] font-semibold
+                   text-white bg-red-500 rounded-full"
+      >
+      {count}
+      </span>
+    )}
   </button>
+
+  {/* Popup */}
+  {showNotifications && (
+    <div
+      className="absolute right-0 mt-2 w-72 rounded-md border border-gray-300 bg-white shadow-lg z-50"
+    >
+     {hasNotification? 
+     <>
+      {notification.map((n,i) => (
+        <div  key={i} className="border-b px-4 py-3 border-gray-300 ">
+        <div className="bg-blue-100 px-2 py-1 rounded ">
+          <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
+          New login from a different device
+        </p>
+        <p className="text-xs text-gray-600 mt-1">
+          {n.deviceName}
+        </p>
+        <p className="text-xs text-gray-500 mt-1">
+          {new Date(n.time).toLocaleTimeString()}
+        </p>
+        </div>
+      </div>
+
+      ) )}
+
+      </> : <div className="flex items-center justify-center pt-4 h-20 ">
+      No notifications
+      </div>}
+
+      <button
+        onClick={() => {
+          clearNotifications()
+          setShowNotifications(false);
+        }}
+        className="w-full text-sm text-red-600 py-2 hover:bg-gray-50"
+      >
+        Clear all
+      </button>
+    </div>
+  )}
+</div>
   <button
     className=" md:flex items-center justify-center w-9 h-9 rounded-md text-black hover:text-gray-700 hover:bg-gray-100 transition"
     aria-label="Settings"

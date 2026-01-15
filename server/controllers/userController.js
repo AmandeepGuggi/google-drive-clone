@@ -171,14 +171,31 @@ try{
 
 
 
-
-
 export const logout = async (req, res) => {
   const { sid } = req.signedCookies;
-   if (sid) {
-    await Session.findByIdAndDelete(sid);
+
+  if (!sid) {
+    return res.status(204).end();
   }
-  await Session.findByIdAndDelete(sid)
-  res.clearCookie('sid')
-  res.status(204).end()
-}
+
+  await Session.deleteOne({
+    _id: sid,
+    userId: req.user._id // 🔐 prevent cross-user delete
+  });
+
+  res.clearCookie("sid");
+  res.status(204).end();
+};
+
+export const logoutAll = async (req, res) => {
+  const userId = req.user._id;
+
+  // 🔥 Kill all sessions for this user
+  await Session.deleteMany({ userId });
+
+  // 🔥 Remove current session cookie
+  res.clearCookie("sid");
+
+  res.status(204).end();
+};
+

@@ -4,6 +4,7 @@ import VerifyOtp from "../Register/VerifyOtp";
 import { useNavigate } from "react-router-dom";
 import LoginScreen from "./LoginScreen";
 import { BASE_URL } from "../../utility";
+import { FaCloud } from "react-icons/fa";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -211,15 +212,15 @@ const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
         <header className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/80 backdrop-blur-lg">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            <div onClick={()=> navigate("/")} className="flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
-                <FolderOpen className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900">CloudVault</span>
-            </div>
+           <div onClick={()=> {navigate("/")}} className="flex items-center gap-2.5">
+                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
+                           <FaCloud className="h-5 w-5 text-white" />
+                         </div>
+                         <span className="text-xl font-bold tracking-tight text-slate-900">CloudVault</span>
+                       </div>
             <nav className=" items-center gap-8 md:flex">
              
-              <button onClick={()=> {navigate("/signUp")}} className="px-6 py-2 border-2 border-blue-600 rounded font-medium hover:bg-blue-600 hover:text-white transition-colors">
+              <button onClick={()=> {navigate("/register")}} className="px-6 py-2 border-2 border-blue-600 rounded font-medium hover:bg-blue-600 hover:text-white transition-colors">
                 Register
               </button>
             </nav>

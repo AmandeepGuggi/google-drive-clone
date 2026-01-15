@@ -12,7 +12,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Home() {
   const { refreshUser } = useAuth();
-  const [view, setView] = useState("grid"); 
+  const [view, setView] = useState("list"); 
   const [sortBy, setSortBy] = useState("name"); 
 const [sortOrder, setSortOrder] = useState("asc"); 
  const [showNewMenu, setShowNewMenu] = useState(false);

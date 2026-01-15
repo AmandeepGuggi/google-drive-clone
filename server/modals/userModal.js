@@ -27,6 +27,9 @@ const userSchema = new Schema({
     storageUsed: {
         type: Number
     },
+    lastNotificationSeenAt: {
+        type: Date
+    },
     //  providerId: {
     //   type: String,
     //   default: null, // Google sub
