@@ -10,6 +10,7 @@ import DashboardLayout from "./DashboardLayout"
 import Home from "./pages/home"
 import Settings from "./pages/Setting/Settings"
 import { AuthProvider } from "./context/AuthContext"
+import UsersPage from "./pages/UsersPage"
 
 const router = createBrowserRouter([
    {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   {
     path: "/settings",
     element: <Settings />
+  },
+  {
+    path: "/users",
+    element: <UsersPage />
   },
  {
     path: "/app",

@@ -51,6 +51,7 @@ async function run() {
               bsonType: "string",
               pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
             },
+             role: {bsonType: "string", enum: ['Admin', 'Manager', 'User']},
             password: { bsonType: "string", minLength: 8 },
             picture: { bsonType: "string"},
             authProvider: { bsonType: "string", enum: ["local", "google", "github"] },

@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 
 app.use("/directory", checkAuthMiddleware, directoryRoutes);
 app.use("/file", checkAuthMiddleware, fileRoutes);
-app.use("/user", userRoutes);
+app.use("/", userRoutes);
 app.use("/otp", authRoutes);
 app.use("/auth", authRoutes);
 

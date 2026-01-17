@@ -30,11 +30,11 @@ const userSchema = new Schema({
     lastNotificationSeenAt: {
         type: Date
     },
-    //  providerId: {
-    //   type: String,
-    //   default: null, // Google sub
-    //   index: true,
-    // },
+     role: {
+      type: String,
+      enum: ["Admin", "Manager", "User"],
+      default: "User",
+    },
    password: {
   type: String,
   minlength: 8,

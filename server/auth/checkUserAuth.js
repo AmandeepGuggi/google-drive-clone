@@ -21,3 +21,18 @@ export default async function checkAuth(req, res, next) {
   req.user = user
   next()
 }
+
+export const notRegularUser =  async (req, res, next)=>{
+  if(req.user.role !== "User"){
+    return next()
+  }else{
+    return res.status(403).json({msg: "You cannot access users"})
+  }
+}
+export const checkIsAdmin =  async (req, res, next)=>{
+  if(req.user.role === "Admin"){
+    return next()
+  }else{
+    return res.status(403).json({msg: "You cannot access users"})
+  }
+}

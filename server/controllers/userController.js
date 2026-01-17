@@ -3,6 +3,7 @@ import Directory from "../modals/directoryModal.js"
 import User from "../modals/userModal.js"
 import Session from "../modals/sessionModal.js"
 import OTP from "../modals/otpModal.js";
+import Files from "../modals/fileModal.js";
 
 
 export const registerUser = async (req, res, next) => {
@@ -199,3 +200,42 @@ export const logoutAll = async (req, res) => {
   res.status(204).end();
 };
 
+export const getAllUsers = async (req, res) => {
+  const allUsers = await User.find().lean()
+  const allSessions = await Session.find().lean()
+  const allSessionsId = allSessions.map(({userId})=> userId.toString() )
+  const allSessionsUserIdSet = new Set(allSessionsId)
+
+  const transformedUsers = allUsers.map(({_id, fullname, email, role}) => ({
+    id: _id,
+    name: fullname,
+    email,
+    isLoggedIn: allSessionsUserIdSet.has(_id.toString()),
+    role
+  }))
+  res.status(200).json(transformedUsers)
+}
+
+export const logoutSpecificUser = async (req, res) => {
+  console.log(req.params);
+    const {id} = req.params
+
+  // 🔥 Kill all sessions for this user
+  await Session.deleteMany({ userId: id });
+
+  res.status(204).end();
+}
+export const delteSpecificUser = async (req, res) => {
+    const {id} = req.params
+
+  try{
+    await Session.deleteMany({ userId: id });
+    await User.deleteOne({_id: id})
+    await Directory.deleteMany({ userId: id })
+    await Files.deleteMany({ userId: id })
+  res.status(204).end();
+  }catch(err){
+    console.log("error deleting specific user", err);
+    res.json({err: "error deleting user"})
+  }
+}
