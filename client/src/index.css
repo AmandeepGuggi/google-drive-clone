@@ -73,3 +73,89 @@
 .no-spinner {
   -moz-appearance: textfield;
 }
+
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #f9f9f9;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #f0f0f0;
+  --secondary-foreground: #0a0a0a;
+  --muted: #e5e5e5;
+  --muted-foreground: #737373;
+  --accent: #3b82f6;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e5e5e5;
+  --input: #f5f5f5;
+  --ring: #3b82f6;
+  --chart-1: #2563eb;
+  --chart-2: #06b6d4;
+  --chart-3: #8b5cf6;
+  --chart-4: #ec4899;
+  --chart-5: #f59e0b;
+  --radius: 0.625rem;
+  --sidebar: #f9f9f9;
+  --sidebar-foreground: #0a0a0a;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0f0f0;
+  --sidebar-accent-foreground: #0a0a0a;
+  --sidebar-border: #e5e5e5;
+  --sidebar-ring: #3b82f6;
+  --success: #16a34a;
+  --warning: #ea8b0b;
+  --info: #2563eb;
+}
+
+@theme inline {
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-[color:var(--border)];
+  }
+  body {
+    @apply bg-[color:var(--background)] text-[color:var(--foreground)];
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-[color:var(--primary)] text-[color:var(--primary-foreground)] hover:opacity-90;
+  }
+
+  .btn-secondary {
+    @apply bg-[color:var(--secondary)] text-[color:var(--secondary-foreground)] hover:bg-[color:var(--muted)];
+  }
+
+  .btn-destructive {
+    @apply bg-[color:var(--destructive)] text-[color:var(--destructive-foreground)] hover:opacity-90;
+  }
+
+  .btn-ghost {
+    @apply text-[color:var(--foreground)] hover:bg-[color:var(--secondary)];
+  }
+
+  .card {
+    @apply rounded-lg border border-[color:var(--border)] bg-[color:var(--card)] p-6;
+  }
+
+  .modal-overlay {
+    @apply fixed py-8 inset-0 bg-black/50 flex items-center justify-center z-50;
+  }
+
+  .modal-content {
+    @apply bg-[color:var(--card)] rounded-lg p-6 max-w-md w-full mx-4;
+  }
+}

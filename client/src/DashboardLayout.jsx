@@ -33,7 +33,7 @@ useEffect(() => {
           setShowProfile={setShowProfile}
         />
       
-
+     
         <main className="p-3 h-full bg-primary  md:bg-white overflow-y-auto">
         <Outlet  />
         </main>

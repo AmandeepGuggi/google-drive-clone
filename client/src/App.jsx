@@ -11,6 +11,7 @@ import Home from "./pages/home"
 import Settings from "./pages/Setting/Settings"
 import { AuthProvider } from "./context/AuthContext"
 import UsersPage from "./pages/UsersPage"
+import Workspace from "./pages/Owner/Workspace"
 
 const router = createBrowserRouter([
    {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
   {
     path: "/users",
     element: <UsersPage />
+  },
+  {
+    path: "/workspace",
+    element: <Workspace />
   },
  {
     path: "/app",

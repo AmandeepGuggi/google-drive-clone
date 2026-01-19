@@ -209,10 +209,13 @@ getUser()
   <button
     className=" md:flex items-center justify-center w-9 h-9 rounded-md text-black hover:text-gray-700 hover:bg-gray-100 transition"
     aria-label="Settings"
-    onClick={() => navigate("/settings")}
+    // onClick={() => navigate("/settings")}
+    onClick={() => navigate("/workspace")}
   >
     <Settings size={18} />
   </button>
+
+  
 
 <div ref={wrapperRef}>
     <div
