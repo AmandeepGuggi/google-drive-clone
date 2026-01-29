@@ -7,9 +7,10 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+ 
   // 🔴 CORE: ask backend who you are
   const getUser = async () => {
+    console.log("requesting user");
     try {
       const res = await fetch(`${BASE_URL}/user/`, {
         method: "GET",
@@ -19,13 +20,12 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       return null;
     }
-      
       if (!res.ok) {
       setUser(null);
-      return null;
     }else{
       const user = await res.json()
       setUser(user);
+     
       return user;
     }
     } catch (err) {
@@ -57,10 +57,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // 🧠 Run once on app load
-  useEffect(() => {
-    getUser();
-  }, []);
 
   return (
     <AuthContext.Provider

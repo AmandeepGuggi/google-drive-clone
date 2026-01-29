@@ -18,9 +18,9 @@ const { user } = useAuth();
    const navigate = useNavigate();
 
    const [loggedIn, setLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("Guest User");
-  const [userEmail, setUserEmail] = useState("guest@example.com");
-  const [profileSrc, setProfileSrc] = useState("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYfAWbelVtedtn8mYCajf5bYv6PJgyMxOR2g&s");
+  const [userName, setUserName] = useState(user.name);
+  const [userEmail, setUserEmail] = useState(user.email);
+  const [profileSrc, setProfileSrc] = useState(user.picture);
 
   const [showNotifications, setShowNotifications] = useState(false);
 const [notification, setNotification] = useState([])
@@ -59,34 +59,11 @@ const clearNotifications = async () => {
   return () => document.removeEventListener("mousedown", handleOutside);
 }, [showProfile, setShowProfile]);
 
-async function getUser() {
-  if (!user) return;
-  try {
-    const response = await fetch("http://localhost:4000/user/", {
-      method: "GET", 
-      credentials: "include",
-    });
 
-    if (!response.ok) {
-      console.error("Unauthorized or failed:", response.status);
-      navigate("/login")
-      setLoggedIn(false);
-      return;
-    }
-
-    const data = await response.json(); 
-    setUserName(data.name);
-    setUserEmail(data.email);
-    setProfileSrc(data.picture || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYfAWbelVtedtn8mYCajf5bYv6PJgyMxOR2g&s");
-    setLoggedIn(true);
-  } catch (err) {
-    console.error("Fetch error:", err);
-  }
-}
 
 
 useEffect(()=> {
-getUser()
+
 if (!user) return; 
  fetchNotifications();
 
@@ -113,7 +90,7 @@ if (!user) return;
         setLoggedIn(false);
         setUserName("");
         setUserEmail("");
-        navigate("/login", { replace: true });
+        // navigate("/login", { replace: true });
       } else {
         console.error("Logout failed");
       }

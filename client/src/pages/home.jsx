@@ -26,7 +26,6 @@ const [sortOrder, setSortOrder] = useState("asc");
 async function buildBreadcrumbs(currentDirId) {
   const path = [];
   let cursor = currentDirId;
-console.log(cursor);
   while (cursor) {
     const res = await fetch(`${BASE_URL}/directory/${cursor}/breadcrumbs`, {
       credentials: "include",
@@ -51,7 +50,6 @@ console.log(cursor);
   return path.reverse();
 }
 
-console.log({breadcrumbs});
 
  // Displayed directory name
 const [directoryName, setDirectoryName] = useState("My Files");

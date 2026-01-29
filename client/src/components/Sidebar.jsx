@@ -6,23 +6,15 @@ import {
 
   FiShare2,
 } from "react-icons/fi";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx"; 
 import { useEffect, useRef, useState } from "react";
 import { formatBytes } from "../utility";
-export default function Sidebar({
-  open,
+export default function Sidebar({ open }) {
+ const { user, loading, getUser } = useAuth();
 
-}) {
- const { user, loading } = useAuth();
- const location = useLocation();
-
-const from = location.state?.from?.pathname || "/login";
-
-  if (loading) return null;
-  // if (!user) return null;
   const navigate = useNavigate()
-  const [storageUsed, setStorageUsed] = useState(0)
+  const [storageUsed, setStorageUsed] = useState(user.storage)
    const storageLimit = 200 * 1024 * 1024; // 500 MB in bytes
  const storagePercentage = Math.min(
   (storageUsed / storageLimit) * 100,
@@ -30,36 +22,6 @@ const from = location.state?.from?.pathname || "/login";
 );
 
 const roundedPercentage = storagePercentage.toFixed(1);
-
-
-async function getUser() {
-  console.log("user is", user);
-  if (!user) return;
-  try {
-    const response = await fetch("http://localhost:4000/user/", {
-      method: "GET", 
-      credentials: "include",
-    });
-
-    if (!response.ok) {
-      console.error("Unauthorized or failed:", response.status);
-      navigate(from, { replace: true });
-      return;
-    }
-
-    const data = await response.json(); 
-    setStorageUsed(data.storage)
-   
-  } catch (err) {
-    console.error("Fetch error:", err);
-  }
-}
-
-useEffect(()=> {
- console.log(user);
- setStorageUsed(user.storage)
- getUser()
-},[user])
 
   return (
     <>

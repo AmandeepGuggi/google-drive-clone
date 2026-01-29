@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useLocation, Navigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext"; 
 
 import VerifyOtp from "../Register/VerifyOtp";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +9,6 @@ import { FaCloud } from "react-icons/fa";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-const { refreshUser, user, loading } = useAuth();
 const location = useLocation();
 
 const from = location.state?.from?.pathname || "/app";
@@ -75,7 +73,6 @@ const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
             setServerError(data.error);
             setIsSubmitting(false)
           } 
-           await refreshUser();
 
     // 🚪 NOW navigate
     navigate(from, { replace: true });
@@ -102,8 +99,8 @@ const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
         const data = await res.json();
       
         if (res.ok) {
-         await refreshUser();
-         navigate(from, { replace: true });
+        //  await refreshUser();
+        //  navigate(from, { replace: true });
 // ✅ ONLY HERE
         } else {
           alert("Invalid OTP");
@@ -130,8 +127,8 @@ const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
             alert(data.error || "Invalid OTP");
             return;
           }
-      await refreshUser();
-navigate(from, { replace: true });
+//       await refreshUser();
+// navigate(from, { replace: true });
 
       
         } finally {
@@ -140,8 +137,8 @@ navigate(from, { replace: true });
       };
 
 const handleLoginSuccess = async () => {
-  await refreshUser();
-  navigate(from, { replace: true });
+  // await refreshUser();
+  // navigate(from, { replace: true });
 };
 
 
@@ -167,11 +164,8 @@ const handleLoginSuccess = async () => {
   }
 };
 
-if (loading) return null;
 
-if (user) {
-  return <Navigate to="/app" replace />;
-}
+
  const renderScreen = () => {
     switch (currentScreen) {
       case "login":
@@ -185,7 +179,7 @@ if (user) {
             isSubmitting={isSubmitting}
             serverError={serverError}
             rememberMe={formData.rememberMe}
-            refreshUser={refreshUser}
+            // refreshUser={refreshUser}
             handleLoginSuccess={handleLoginSuccess}
             // isSending={isSending}
             // serverError={serverError}

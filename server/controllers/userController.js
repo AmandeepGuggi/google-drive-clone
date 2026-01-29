@@ -16,7 +16,7 @@ export const registerUser = async (req, res, next) => {
   }
 
   const foundUser = await User.exists({ email })
-  console.log("hii", {foundUser});
+  // console.log("hii", {foundUser});
   if (foundUser) {
     return res.status(409).json({
       error: "User with this email already exists",
@@ -62,7 +62,7 @@ export const registerUser = async (req, res, next) => {
     sameSite: "lax",
     maxAge: 1000 * 60 * 60 * 24 * 7 ,
   },)
-  console.log("loginSession created", req.signedCookies);
+  // console.log("loginSession created", req.signedCookies);
   res.status(201).json({ message: 'User Registered and logged in', status: 201 })
     
   } catch (err) {
@@ -100,7 +100,6 @@ try{
   const activeSessions = await redisClient.ft.search(
     "userIdIdx", 
     `@userId:{${foundUser.id}}`)
-    console.log(activeSessions);
    if (activeSessions.total >= MAX_SESSIONS) {
       // await Session.deleteOne({ _id: activeSessions[0]._id });
       await redisClient.del(activeSessions.documents[0].id)

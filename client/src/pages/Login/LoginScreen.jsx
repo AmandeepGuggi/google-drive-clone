@@ -17,7 +17,6 @@ const LoginScreen = ({
   isSubmitting,
   serverError,
   rememberMe,
-  refreshUser,
   handleLoginSuccess
 
 }) => {
@@ -68,7 +67,7 @@ const githubLogin = () => {
             <label
               className={`absolute transition-all duration-200 pointer-events-none 
         ${
-          focus
+          focus || passwordTxt?.length > 0 
             ? "-top-3 text-sm text-gray-500"
             : "top-3 text-base text-gray-400"
         }`}
@@ -166,7 +165,7 @@ const githubLogin = () => {
             onError={() => {
               console.log("Login Failed");
             }}
-            useOneTap
+            // useOneTap
             
             logo_alignment="center"
             
