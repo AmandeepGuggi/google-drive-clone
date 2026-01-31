@@ -150,14 +150,16 @@ useEffect(() => {
 
   return (
     <div className="fixed inset-0 z-50   flex items-center justify-center bg-black/50 p-4">
-        {loading && (
+        
+
+      {/* <div className="w-full max-w-md rounded-lg bg-white shadow-lg overflow-hidden"> */}
+      <div className="relative w-full max-w-md max-h-[90vh] rounded-lg bg-white shadow-lg flex flex-col">
+    {loading && (
   <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-50">
     <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
   </div>
 )}
 
-      {/* <div className="w-full max-w-md rounded-lg bg-white shadow-lg overflow-hidden"> */}
-      <div className="w-full max-w-md max-h-[90vh] rounded-lg bg-white shadow-lg flex flex-col">
 
         {/* Header */}
         <div className="flex justify-between items-start border-b p-5">
