@@ -162,7 +162,7 @@ export const createFile = async (req, res, next) => {
 export const driveFiles = async (req, res) => {
    const { files, accessToken, dirId } = req.body;
    console.log(req.body);
-  const _id = dirId ?? req.user.rootDirId;
+  const _id = dirId ? dirId : req.user.rootDirId;
   const parentDirData = await Directory.findOne({ _id });
   if (!parentDirData) {
     return res.status(404).json({ error: "Parent directory does not exist" });
@@ -206,7 +206,6 @@ async function importSingleFile(file, accessToken, userId, parentDirData) {
   }
 
   const meta = await metaRes.json();
-  console.log("meta", meta);
 
   // ❌ Reject Google Docs for MVP
   if (meta.mimeType.startsWith("application/vnd.google-apps")) {

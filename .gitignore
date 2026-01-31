@@ -31,3 +31,4 @@ dist-ssr
 *.sw?
 
 client/.env
+server/.env

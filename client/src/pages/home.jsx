@@ -12,7 +12,8 @@ import ShareFileModal from "../components/modals/ShareFileModal.jsx";
 
 
 export default function Home() {
-  
+  const [selectedItemId, setSelectedItemId] = useState(null);
+
   const { refreshUser , user} = useAuth();
   const [view, setView] = useState("list"); 
   const [sortBy, setSortBy] = useState("name"); 
@@ -112,7 +113,6 @@ const importFromDrive = async (files) => {
   if(response.ok){
     getDirectoryItems()
   }
-  console.log("drive files", files);
 };
 
 
@@ -676,21 +676,7 @@ return 0;
     <Upload size={16} />
     Upload File
   </button>
-  {/* <button
-    
-    className="flex items-center gap-2 px-4 py-2 text-sm font-medium border-gray-300 border cursor-pointer
-               rounded-md  text-black hover:bg-gray-300" 
-  >
-    google.accounts.oauth2.initTokenClient({
-  client_id: clientId,
-  scope: "https://www.googleapis.com/auth/drive.readonly",
-  callback: (tokenResponse) => {
-    // tokenResponse.access_token
-  }
-});
-
-    Import from drive
-  </button> */}
+  
 
 <button
   onClick={requestDriveToken}
@@ -908,14 +894,28 @@ const icon = getFileIcon(item.name)
       
     <div
   key={item.id}
-  className="border group border-gray-300 rounded-lg px-4 py-1 cursor-pointer hover:bg-gray-50"
-  onClick={() =>
-    !(activeContextMenu || isUploading) &&
-    handleRowClick(item.isDirectory ? "directory" : "file", item.id)
+  className={`border rounded-lg px-4 py-1 cursor-pointer
+  ${selectedItemId === item.id ? "bg-blue-50 border-blue-400" : "hover:bg-gray-50"}
+`}
+
+  onClick={() => {
+  if (isUploading) return;
+  setSelectedItemId(item.id);
+}}
+onDoubleClick={() => {
+  if (isUploading) return;
+
+  if (item.isDirectory) {
+    navigate(`/app/${item.id}`);
+  } else {
+    window.open(`${BASE_URL}/file/${item.id}`, "_blank");
   }
+}}
+
   onContextMenu={(e) => {
     if (isUploadingItem) return; 
     e.preventDefault();
+    setSelectedItemId(item.id);
     handleContextMenu(e, item.id);
     const menuWidth = 180;
   const menuHeight = 220;
@@ -974,6 +974,7 @@ const icon = getFileIcon(item.name)
     if (isUploadingItem) return; 
     e.preventDefault();
     handleContextMenu(e, item.id);
+    setSelectedItemId(item.id);
     const menuWidth = 180;
   const menuHeight = 220;
 
@@ -1059,6 +1060,7 @@ const uploadProgress = progressMap[item.id] || 0;
   onContextMenu={(e) => {
     if (isUploadingItem) return; 
     e.preventDefault();
+    setSelectedItemId(item.id);
     handleContextMenu(e, item.id);
     const menuWidth = 180;
   const menuHeight = 220;
@@ -1108,6 +1110,7 @@ const uploadProgress = progressMap[item.id] || 0;
     if (isUploadingItem) return; 
     e.preventDefault();
     handleContextMenu(e, item.id);
+    setSelectedItemId(item.id);
     const menuWidth = 180;
   const menuHeight = 220;
 
@@ -1196,6 +1199,7 @@ const icon = getFileIcon(item.name);
   onContextMenu={(e) => {
     if (isUploadingItem) return; 
     e.preventDefault();
+    setSelectedItemId(item.id);
     handleContextMenu(e, item.id);
     const menuWidth = 180;
   const menuHeight = 220;
