@@ -6,7 +6,9 @@ import {
   MdStarBorder,
   MdDeleteOutline,
   MdCancel,
+  MdShare
 } from "react-icons/md";
+import { formatBytes } from "../utility";
 
 export default function ContextMenu({
   isUploadingItem,
@@ -21,6 +23,8 @@ export default function ContextMenu({
   menuRef,
   position,
   onClose,
+  setShowShareModal,
+  shareFileDetails
 }) {
  
   useEffect(() => {
@@ -124,6 +128,20 @@ export default function ContextMenu({
           >
             <MdDriveFileRenameOutline className="h-5 w-5" />
             Rename
+          </div>
+          <div
+            className={`flex w-full items-center gap-3 px-4 py-2 text-sm hover:bg-gray-100  `}
+            onClick={() => {
+              shareFileDetails({
+                id: item.id,
+                name: item.name,
+                size: formatBytes(item.size),
+              })
+               setShowShareModal(true)
+            }}
+          >
+            <MdShare className="h-5 w-5" />
+            Share
           </div>
           <div onClick={() => toggleStar(item.id, item.isDirectory)}
             className={`flex w-full items-center gap-3 px-4 py-2 text-sm hover:bg-gray-100  `}

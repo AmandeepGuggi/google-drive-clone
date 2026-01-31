@@ -11,6 +11,7 @@ import { execFile } from "child_process";
 import { promisify } from "util";
 import User from "../modals/userModal.js";
 import { pipeline } from "stream/promises";
+import ShareLink from "../modals/ShareLink.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -516,3 +517,94 @@ export const restoreFile = async (req, res) => {
 
   res.json({ success: true });
 };
+
+export const getExistingLink = async (req, res) => {
+  const userId = req.user._id;
+  const { fileId } = req.params
+  const file = await Files.findById(fileId);
+  const existingLink = await ShareLink.findOne({fileId, revoked: false})
+
+
+if (!file) {
+  return res.status(404).json({error: "File does not exist"})
+}
+
+if (file.userId.toString() !== userId.toString() ) {
+  return res.status(404).json({error: "only owner can create link"})
+}
+
+ if(existingLink){
+  res.json({
+  shareUrl: `http://localhost:4000/file/s/${existingLink.token}` });
+ }else{
+return res.status(204).send();
+ }
+
+
+
+}
+
+export const createShareLink = async (req, res) => {
+  const userId = req.user._id;
+  const { fileId } = req.params
+  const file = await Files.findById(fileId);
+  const existingLink = await ShareLink.findOne({fileId, revoked: false})
+
+
+if (!file) {
+  return res.status(404).json({error: "File does not exist"})
+}
+
+if (file.userId.toString() !== userId.toString() ) {
+  return res.status(404).json({error: "only owner can create link"})
+}
+
+ if(existingLink){
+  res.json({
+  shareUrl: `http://localhost:4000/file/s/${existingLink.token}` });
+ }
+
+const token = crypto.randomUUID(16).toString("hex");
+
+await ShareLink.create({
+  fileId,
+  token,
+  permission: "view", // start simple
+  expiresAt: null,
+  revoked: false,
+  createdBy: userId
+});
+res.json({
+  shareUrl: `http://localhost:4000/file/s/${token}`
+});
+}
+
+export const getSharedFile = async (req, res) => {
+  const { token } = req.params
+  console.log({token});
+  const link = await ShareLink.findOne({ token });
+
+if (!link || link.revoked) {
+  res.status(403).json({error: "access revoked or does not exist"})
+}
+if (link.expiresAt && link.expiresAt < Date.now()) throw 403;
+
+const fileData = await Files.findById(link.fileId);
+const filePath = `${process.cwd()}/storage/${fileData._id.toString()}${fileData.extension}`;
+
+// permission check based on link.permission
+
+res.setHeader("Content-Type", fileData.mimeType);
+  res.setHeader("Content-Disposition", "inline");
+
+  fs.createReadStream(filePath).pipe(res);
+
+}
+
+export const deleteLink = async (req, res) => {
+  const userId = req.user._id;
+  const { fileId } = req.params
+  const file = await Files.findById(fileId);
+  const existingLink = await ShareLink.findOneAndDelete({fileId})
+  res.json({message: "access deleted"})
+}

@@ -3,7 +3,6 @@ import {
   FiHome,
   FiTrash2,
   FiStar,
-
   FiShare2,
 } from "react-icons/fi";
 import { NavLink, useNavigate } from "react-router-dom";

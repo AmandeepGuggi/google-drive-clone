@@ -6,6 +6,7 @@ import { Filter, FolderPlus, LayoutGrid, List, MoreVertical, Upload } from "luci
 import { FaFolder, FaStar, FaHome } from "react-icons/fa";
 import ContextMenu from "../components/ContextMenu.jsx";
 import { useAuth } from "../context/AuthContext.jsx"; 
+import ShareFileModal from "../components/modals/ShareFileModal.jsx";
 
 
 
@@ -22,7 +23,12 @@ const [sortOrder, setSortOrder] = useState("asc");
   const { dirId } = useParams();
   const navigate = useNavigate();
   const [breadcrumbs, setBreadcrumbs] = useState([]);
-const [openShareFile, setOpenShareFile] = useState(false)
+const [showShareModal, setShowShareModal] = useState(false)
+const [sharefileDetails, setShareFileDetails] = useState({
+  id: "",
+  name: "",
+  size: "",
+})
 
  const clientId = import.meta.env.VITE_DRIVE_CLIENT_ID;
  const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
@@ -1348,6 +1354,8 @@ const icon = getFileIcon(item.name);
           handleRenameSubmit={handleRenameSubmit}
           openRenameModal={openRenameModal}
           toggleStar={toggleStar}
+          setShowShareModal={setShowShareModal}
+          shareFileDetails={setShareFileDetails}
           onClose={() => {
             setMenuState(null);
             setActiveContextMenu(null);
@@ -1377,6 +1385,21 @@ const icon = getFileIcon(item.name);
                 actionLabel="Rename"
               />
             )}
+            {
+              showShareModal && (
+                 <ShareFileModal
+                 fileId={sharefileDetails.id}
+          fileName={sharefileDetails.name}
+          fileSize= {sharefileDetails.size}
+          filePath="Shared Drive / Projects"
+          onClose={() => {
+            setShowShareModal(false)
+            setShareFileDetails(null)
+          }}
+        />
+              )}
+
+           
     </>
   );
 }
